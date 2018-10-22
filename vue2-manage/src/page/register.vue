@@ -1,37 +1,36 @@
 <template>
   	<div class="login_page fillcontain">
 	  	<transition name="form-fade" mode="in-out">
-	  		<section class="form_contianer" v-show="showLogin">
+	  		<section class="form_contianer" v-show="showRegister">
 		  		<div class="manage_tip">
 		  			<p>elm后台管理系统</p>
 		  		</div>
-		    	<el-form :model="loginForm" :rules="rules" ref="loginForm">
+		    	<el-form :model="registerForm" :rules="rules" ref="registerForm">
 					<el-form-item prop="username">
-						<el-input v-model="loginForm.username" placeholder="用户名"><span></span></el-input>
+						<el-input v-model="registerForm.username" placeholder="用户名"><span></span></el-input>
 					</el-form-item>
 					<el-form-item prop="password">
-						<el-input type="password" placeholder="密码" v-model="loginForm.password"></el-input>
+						<el-input type="password" placeholder="密码" v-model="registerForm.password"></el-input>
 					</el-form-item>
 					<el-form-item>
-				    	<el-button type="primary" @click="submitForm('loginForm')" class="submit_btn">登录</el-button>
+				    	<el-button type="primary" @click="submitForm('registerForm')" class="submit_btn">注册</el-button>
 				  	</el-form-item>
 				</el-form>
 				<p class="tip">温馨提示：</p>
-				<p class="tip">还没有注册的用户，点击<router-link to="/register">注册</router-link></p>
-				<p class="tip">注册过的用户可凭账号密码登录</p>
+				<p class="tip">注册过的用户,点击<router-link to="/">登录</router-link></p>
 	  		</section>
 	  	</transition>
   	</div>
 </template>
 
 <script>
-	import {login, getAdminInfo} from '@/api/getData'
+	import {register, getAdminInfo} from '@/api/getData'
 	import {mapActions, mapState} from 'vuex'
 
 	export default {
 	    data(){
 			return {
-				loginForm: {
+				registerForm: {
 					username: '',
 					password: '',
 				},
@@ -43,11 +42,11 @@
 						{ required: true, message: '请输入密码', trigger: 'blur' }
 					],
 				},
-				showLogin: false,
+				showRegister: false,
 			}
 		},
 		mounted(){
-			this.showLogin = true;
+			this.showRegister = true;
 			if (!this.adminInfo.id) {
     			this.getAdminData()
     		}
@@ -60,11 +59,11 @@
 			async submitForm(formName) {
 				this.$refs[formName].validate(async (valid) => {
 					if (valid) {
-						const res = await login({user_name: this.loginForm.username, password: this.loginForm.password})
+						const res = await register({user_name: this.registerForm.username, password: this.registerForm.password})
 						if (res.status == 1) {
 							this.$message({
 		                        type: 'success',
-		                        message: '登录成功'
+		                        message: '注册成功'
 		                    });
 							this.$router.push('manage')
 						}else{
@@ -76,7 +75,7 @@
 					} else {
 						this.$notify.error({
 							title: '错误',
-							message: '请输入正确的用户名密码',
+							message: '请输入用户名或密码',
 							offset: 100
 						});
 						return false;

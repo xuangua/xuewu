@@ -45,23 +45,24 @@ class Admin extends AddressComponent {
 			try{
 				const admin = await AdminModel.findOne({user_name})
 				if (!admin) {
-					const adminTip = status == 1 ? '管理员' : '超级管理员'
-					const admin_id = await this.getId('admin_id');
-					const cityInfo = await this.guessPosition(req);
-					const newAdmin = {
-						user_name, 
-						password: newpassword, 
-						id: admin_id,
-						create_time: dtime().format('YYYY-MM-DD HH:mm'),
-						admin: adminTip,
-						status,
-						city: cityInfo.city
-					}
-					await AdminModel.create(newAdmin)
-					req.session.admin_id = admin_id;
+					// const adminTip = status == 1 ? '管理员' : '超级管理员'
+					// const admin_id = await this.getId('admin_id');
+					// const cityInfo = await this.guessPosition(req);
+					// const newAdmin = {
+					// 	user_name, 
+					// 	password: newpassword, 
+					// 	id: admin_id,
+					// 	create_time: dtime().format('YYYY-MM-DD HH:mm'),
+					// 	admin: adminTip,
+					// 	status,
+					// 	city: cityInfo.city
+					// }
+					// await AdminModel.create(newAdmin)
+					// req.session.admin_id = admin_id;
 					res.send({
-						status: 1,
-						success: '注册管理员成功',
+						status: 0,
+                        type: 'USER_NOT_EXIST',
+						message: '该用户不存在，请先注册',
 					})
 				}else if(newpassword.toString() != admin.password.toString()){
 					console.log('管理员登录密码错误');
@@ -131,9 +132,10 @@ class Admin extends AddressComponent {
 						user_name, 
 						password: newpassword, 
 						id: admin_id,
-						create_time: dtime().format('YYYY-MM-DD'),
+						create_time: dtime().format('YYYY-MM-DD HH:mm'),
 						admin: adminTip,
-						status,
+                        status,
+                        city: cityInfo.city
 					}
 					await AdminModel.create(newAdmin)
 					req.session.admin_id = admin_id;

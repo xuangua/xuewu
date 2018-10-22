@@ -11,7 +11,7 @@ let routerMode = 'hash';
 let baseImgPath;
 
 if (process.env.NODE_ENV == 'development') {
-	baseUrl = '//dev.xuangua.com';
+	baseUrl = 'http://localhost:8001';
     baseImgPath = '/img/';
 }else{
 	baseUrl = '//dev.xuangua.com';

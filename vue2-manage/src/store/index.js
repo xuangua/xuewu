@@ -1,10 +1,15 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import createPersistedState from "vuex-persistedstate"
 import {getAdminInfo} from '@/api/getData'
 
 Vue.use(Vuex)
 
 const state = {
+	siteConfig: {},
+	status: '',
+	isLoggedIn: false,
+	token: localStorage.getItem('token') || '',
 	adminInfo: {
 		avatar: 'default.jpg'
 	},
@@ -13,6 +18,11 @@ const state = {
 const mutations = {
 	saveAdminInfo(state, adminInfo){
 		state.adminInfo = adminInfo;
+		state.isLoggedIn = true;
+	},
+	clearAdminInfo(state){
+		state.adminInfo = {};
+		state.isLoggedIn = false;
 	}
 }
 
@@ -30,9 +40,24 @@ const actions = {
 		}
 	}
 }
+const getters = {
+	isLoggedIn: state => state.isLoggedIn,
+	authStatus: state => state.status,
+}
 
 export default new Vuex.Store({
 	state,
 	actions,
 	mutations,
+	getters,
+	plugins: [createPersistedState({
+		storage: window.sessionStorage,
+		reducer(val) {
+			return {
+			    // 只储存state中的assessmentData
+				adminInfo: val.adminInfo,
+				isLoggedIn: val.isLoggedIn
+			}
+		}
+	})]
 })

@@ -191,6 +191,13 @@
        	 			image_path: '',
        	 			business_license_image: '',
        	 			catering_service_license_image: '',
+			        // city: {},
+			        // cityId: this.city,
+
+    				owner_id: 0,
+       	 			school_name: '',
+       	 			school_campus_name: '',
+       	 			school_dorm_name: '',
 
 		        },
 		        rules: {
@@ -239,7 +246,7 @@
     	methods: {
     		async initData(){
     			try{
-    				this.city = await cityGuess();
+    				// this.city = await cityGuess();
     				const categories = await foodCategory();
     				categories.forEach(item => {
     					if (item.sub_categories.length) {
@@ -389,7 +396,7 @@
 						})
 						try{
 							let result = await addShop(this.formData);
-							if (result.status == 1) {
+							if (result.errNo == 0) {
 								this.$message({
 					            	type: 'success',
 					            	message: '添加成功'
@@ -415,6 +422,10 @@
 				       	 			image_path: '',
 				       	 			business_license_image: '',
 				       	 			catering_service_license_image: '',
+				       	 			owner_id: 9,
+				       	 			school_name: '',
+				       	 			school_campus_name: '',
+				       	 			school_dorm_name: '',
 						        };
 						        this.selectedCategory = ['快餐便当', '简餐'];
 						        this.activities = [{
@@ -425,7 +436,7 @@
 							}else{
 								this.$message({
 					            	type: 'error',
-					            	message: result.message
+					            	message: result.msg
 					          	});
 							}
 							console.log(result)

@@ -1,10 +1,12 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import store from '../store/'
 
 Vue.use(Router)
 
 const login = r => require.ensure([], () => r(require('@/page/login')), 'login');
 const register = r => require.ensure([], () => r(require('@/page/register')), 'register');
+const signup = r => require.ensure([], () => r(require('@/page/signup')), 'signup');
 const manage = r => require.ensure([], () => r(require('@/page/manage')), 'manage');
 const home = r => require.ensure([], () => r(require('@/page/home')), 'home');
 const addShop = r => require.ensure([], () => r(require('@/page/addShop')), 'addShop');
@@ -25,20 +27,34 @@ const explain = r => require.ensure([], () => r(require('@/page/explain')), 'exp
 const routes = [
 	{
 		path: '/',
-		component: login
+		component: manage,
+		meta: {requiresAuth: true},
+	},
+	{
+		path: '/login',
+		component: login,
 	},
 	{
 		path: '/register',
 		component: register
 	},
 	{
+		path: '/signup',
+		component: signup,
+	},
+	{
 		path: '/manage',
 		component: manage,
+		meta: {requiresAuth: true},
 		name: '',
 		children: [{
 			path: '',
 			component: home,
-			meta: [],
+			// meta: {requiresAuth: true},
+		},{
+			path: '/login',
+			component: login,
+			// meta: ['添加数据', '添加商铺'],
 		},{
 			path: '/addShop',
 			component: addShop,
@@ -99,7 +115,72 @@ const routes = [
 	}
 ]
 
-export default new Router({
+let router = new Router({
 	routes,
 	strict: process.env.NODE_ENV !== 'production',
 })
+
+// /**
+//  * Before each route we will see if the current user is authorized
+//  * to access the given route
+//  */
+// // router.beforeEach(({to, next, abort, redirect}) => {
+// router.beforeEach(({to, from, next}) => {
+//     console.log(to)
+//     console.log(next)
+//     // console.log(abort)
+//     // console.log(redirect)
+//     let authorized = false
+//     let user = JSON.parse(window.localStorage.getItem('atiiv.auth-user'))
+    
+//     /**
+//      * Remember that access object in the routes? Yup this why we need it.
+//      *
+//      */
+//     if (to.access !== undefined) {
+//         authorized = Authorization.authorize(
+//             to.access.requiresLogin,
+//             to.access.requiredPermissions,
+//             to.access.permissionType
+//         )
+
+//         if (authorized === 'loginIsRequired') {
+//             router.go({name: 'login'})
+//         }
+
+//         if (authorized === 'notAuthorized') {
+//             /**
+//              * Redirects to a "default" page 
+//              */
+//             router.go({ /*...*/ })
+//         }
+//     }
+//     /**
+//      * Everything is fine? Let's to the page then.
+//      */
+//     next()
+// })
+
+router.beforeEach((to, from, next) => {
+  // console.log(to)
+  // console.log(from)
+  // console.log(next)
+  // console.log(to.meta)
+  if(to.matched.some(record => record.meta.requiresAuth)) {
+  // if(to.meta) {
+    // console.log("store.state")
+    // console.log(store.state)
+    // console.log("store.getters.isLoggedIn")
+    // console.log(store.getters.isLoggedIn)
+    if (store.getters.isLoggedIn) {
+      next()
+      return
+    }
+    next('/login') 
+  } else {
+  	// console.log("to next")
+    next() 
+  }
+})
+
+export default router

@@ -27,6 +27,7 @@
     		}
     	},
     	created(){
+            console.log(this.adminInfo)
     		if (!this.adminInfo.id) {
     			this.getAdminData()
     		}
@@ -40,17 +41,18 @@
 				if (command == 'home') {
 					this.$router.push('/manage');
 				}else if(command == 'singout'){
-					const res = await signout()
-					if (res.status == 1) {
+					const res = await signout(this.adminInfo)
+					if (res.errNo == 0) {
 						this.$message({
 	                        type: 'success',
 	                        message: '退出成功'
 	                    });
-	                    this.$router.push('/');
+                        this.$store.commit('clearAdminInfo');
+	                    this.$router.push('/login');
 					}else{
 						this.$message({
 	                        type: 'error',
-	                        message: res.message
+	                        message: res.msg
 	                    });
 					}
 				}

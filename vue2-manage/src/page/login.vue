@@ -47,6 +47,7 @@
 			}
 		},
 		mounted(){
+			console.log(this.adminInfo)
 			this.showLogin = true;
 			if (!this.adminInfo.id) {
     			this.getAdminData()
@@ -60,17 +61,19 @@
 			async submitForm(formName) {
 				this.$refs[formName].validate(async (valid) => {
 					if (valid) {
-						const res = await login({user_name: this.loginForm.username, password: this.loginForm.password})
-						if (res.status == 1) {
+						const res = await login({signinInput: this.loginForm.username, password: this.loginForm.password})
+						if (res.errNo == 0) {
 							this.$message({
 		                        type: 'success',
 		                        message: '登录成功'
 		                    });
+		                    // this.adminInfo = res.adminInfo;
+		                    this.$store.commit('saveAdminInfo', res.data.user);
 							this.$router.push('manage')
 						}else{
 							this.$message({
 		                        type: 'error',
-		                        message: res.message
+		                        message: res.msg
 		                    });
 						}
 					} else {
@@ -86,6 +89,7 @@
 		},
 		watch: {
 			adminInfo: function (newValue){
+				console.log(newValue)
 				if (newValue.id) {
 					this.$message({
                         type: 'success',

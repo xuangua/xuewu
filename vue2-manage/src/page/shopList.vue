@@ -126,6 +126,8 @@
     import headTop from '../components/headTop'
     import {baseUrl, baseImgPath} from '@/config/env'
     import {cityGuess, getResturants, getResturantsCount, foodCategory, updateResturant, searchplace, deleteResturant} from '@/api/getData'
+    import {mapActions, mapState} from 'vuex'
+
     export default {
         data(){
             return {
@@ -142,6 +144,7 @@
                 categoryOptions: [],
                 selectedCategory: [],
                 address: {},
+                getShopListParm: {},
             }
         },
         created(){
@@ -150,11 +153,16 @@
     	components: {
     		headTop,
     	},
+        computed: {
+            ...mapState(['adminInfo']),
+        },
         methods: {
             async initData(){
                 try{
-                    this.city = await cityGuess();
-                    const countData = await getResturantsCount();
+                    // console.log(this.adminInfo)
+                    // this.city = await cityGuess();
+                    this.getShopListParm.owner_id = this.adminInfo.id
+                    const countData = await getResturantsCount(this.getShopListParm);
                     if (countData.status == 1) {
                         this.count = countData.count;
                     }else{

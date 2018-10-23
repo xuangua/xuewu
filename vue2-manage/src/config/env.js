@@ -11,11 +11,12 @@ let routerMode = 'hash';
 let baseImgPath;
 
 if (process.env.NODE_ENV == 'development') {
-	baseUrl = 'http://localhost:8001';
+    //baseUrl = '//dev.xuangua.xyz';
+    baseUrl = '//dev.xuangua.com/api/xuewu';
     baseImgPath = '/img/';
 }else{
-	baseUrl = '//dev.xuangua.com';
-    baseImgPath = '//dev.xuangua.com/img/';
+    baseUrl = '//dev.xuangua.com/api/xuewu';
+    baseImgPath = '//dev.xuangua.xyz/img/';
 }
 
 export {

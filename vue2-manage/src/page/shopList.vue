@@ -92,7 +92,7 @@
                         <el-input v-model="selectTable.description"></el-input>
                     </el-form-item>
                     <el-form-item label="联系电话" label-width="100px">
-                        <el-input v-model="selectTable.phone"></el-input>
+                        <el-input v-model.number="selectTable.phone" maxLength="11"></el-input>
                     </el-form-item>
                     <el-form-item label="店铺分类" label-width="100px">
                         <el-cascader
@@ -163,8 +163,8 @@
                     // this.city = await cityGuess();
                     this.getShopListParm.owner_id = this.adminInfo.id
                     const countData = await getResturantsCount(this.getShopListParm);
-                    if (countData.status == 1) {
-                        this.count = countData.count;
+                    if (countData.errNo == 0) {
+                        this.count = countData.data.count;
                     }else{
                         throw new Error('获取数据失败');
                     }
@@ -240,19 +240,19 @@
             async handleDelete(index, row) {
                 try{
                     const res = await deleteResturant(row.id);
-                    if (res.status == 1) {
+                    if (res.errNo == 0) {
                         this.$message({
                             type: 'success',
                             message: '删除店铺成功'
                         });
                         this.tableData.splice(index, 1);
                     }else{
-                        throw new Error(res.message)
+                        throw new Error(res.msg)
                     }
                 }catch(err){
                     this.$message({
                         type: 'error',
-                        message: err.message
+                        message: err.msg
                     });
                     console.log('删除店铺失败')
                 }
@@ -302,7 +302,7 @@
                     Object.assign(this.selectTable, this.address);
                     this.selectTable.category = this.selectedCategory.join('/');
                     const res = await updateResturant(this.selectTable)
-                    if (res.status == 1) {
+                    if (res.errNo == 0) {
                         this.$message({
                             type: 'success',
                             message: '更新店铺信息成功'
@@ -311,7 +311,7 @@
                     }else{
                         this.$message({
                             type: 'error',
-                            message: res.message
+                            message: res.msg
                         });
                     }
                 }catch(err){

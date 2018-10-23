@@ -15,7 +15,7 @@
 						  style="width: 100%;"
 						  @select="addressSelect"
 						></el-autocomplete>
-						<span>当前城市：{{city.name}}</span>
+						<!-- <span>当前城市：{{city.name}}</span> -->
 					</el-form-item>
 					<el-form-item label="联系电话" prop="phone">
 						<el-input v-model.number="formData.phone" maxLength="11"></el-input>

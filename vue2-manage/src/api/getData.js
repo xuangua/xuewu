@@ -127,7 +127,7 @@ export const foodCategory = (latitude, longitude) => fetch('/admin/shopping/v2/r
  * 获取餐馆列表
  */
 
-export const getResturants = data => fetch('/admin/shopping/restaurants', data);
+export const getResturants = data => fetch('/admin/shopping/getAdminUserShopList', data);
 
 /**
  * 获取餐馆详细信息
@@ -145,13 +145,13 @@ export const getResturantsCount = data => fetch('/admin/shopping/getShopCount', 
  * 更新餐馆信息
  */
 
-export const updateResturant = data => fetch('/admin/shopping/updateshop', data, 'POST');
+export const updateResturant = data => fetch('/admin/shopping/updateShop', data, 'POST');
 
 /**
  * 删除餐馆
  */
 
-export const deleteResturant = restaurant_id => fetch('/admin/shopping/restaurant/' + restaurant_id, {}, 'DELETE');
+export const deleteResturant = restaurant_id => fetch('/admin/shopping/deleteShop/' + restaurant_id, {}, 'DELETE');
 
 /**
  * 获取食品列表

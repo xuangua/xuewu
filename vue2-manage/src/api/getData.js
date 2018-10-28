@@ -231,3 +231,39 @@ export const getAddressById = address_id => fetch('/admin/v1/addresse/' + addres
  */
 
 export const getUserCity = () => fetch('/admin/v1/user/city/count');
+
+/**
+ * 添加地址
+ */
+
+export const addAddress = data => fetch('/admin/addShopAddress', data, 'POST');
+
+/**
+ * 添加商品
+ */
+
+export const addFoodCategory= data => fetch('/admin/addFoodCategory', data, 'POST');
+
+/**
+ * 删除地址
+ */
+
+export const deleteShopAddress = id => fetch('/admin/deleteShopAddress/' + id, {}, 'DELETE');
+
+/**
+ * 删除食品
+ */
+
+export const deleteFoodCategory= id => fetch('/admin/deleteFoodCategory/' + id, {}, 'DELETE');
+
+/**
+ * 获取地址
+ */
+
+export const shopAddressList = () => fetch('/admin/getShopAddressList');
+
+/**
+ * 获取商品
+ */
+
+export const foodCategoryList= () => fetch('/admin/getFoodCategoryList');

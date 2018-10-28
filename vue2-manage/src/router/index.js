@@ -11,6 +11,10 @@ const manage = r => require.ensure([], () => r(require('@/page/manage')), 'manag
 const home = r => require.ensure([], () => r(require('@/page/home')), 'home');
 const addShop = r => require.ensure([], () => r(require('@/page/addShop')), 'addShop');
 const addGoods = r => require.ensure([], () => r(require('@/page/addGoods')), 'addGoods');
+const foodCategory = r => require.ensure([], () => r(require('@/page/foodCategory')), 'foodCategory');
+const shopAddress = r => require.ensure([], () => r(require('@/page/shopAddress')), 'shopAddress');
+const foodCategoryList = r => require.ensure([], () => r(require('@/page/foodCategoryList')), 'foodCategoryList');
+const shopAddressList = r => require.ensure([], () => r(require('@/page/shopAddressList')), 'shopAddressList');
 const userList = r => require.ensure([], () => r(require('@/page/userList')), 'userList');
 const shopList = r => require.ensure([], () => r(require('@/page/shopList')), 'shopList');
 const foodList = r => require.ensure([], () => r(require('@/page/foodList')), 'foodList');
@@ -111,6 +115,25 @@ const routes = [
 			path: '/explain',
 			component: explain,
 			meta: ['说明', '说明'],
+		},{
+			path: '/shopAddress',
+			component: shopAddress,
+			meta: ['添加数据', '添加地址'],
+		},
+		{
+			path: '/foodCategory',
+			component: foodCategory,
+			meta: ['添加数据', '添加商品'],
+		},
+		{
+			path: '/shopAddressList',
+			component: shopAddressList,
+			meta: ['添加数据', '添加地址'],
+		},
+		{
+			path: '/foodCategoryList',
+			component: foodCategoryList,
+			meta: ['添加数据', '添加商品'],
 		}]
 	}
 ]

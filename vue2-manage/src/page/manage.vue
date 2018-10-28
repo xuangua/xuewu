@@ -36,6 +36,13 @@
 						<template slot="title"><i class="el-icon-warning"></i>说明</template>
 						<el-menu-item index="explain">说明</el-menu-item>
 					</el-submenu>
+					<el-submenu index="8" v-if="adminRole == 4">
+						<template slot="title"><i class="el-icon-plus"></i>数据录入</template>
+						<el-menu-item index="shopAddress">添加地址</el-menu-item>
+						<el-menu-item index="foodCategory">添加商品</el-menu-item>
+						<el-menu-item index="shopAddressList">地址列表</el-menu-item>
+						<el-menu-item index="foodCategoryList">商品列表</el-menu-item>
+					</el-submenu>
 				</el-menu>
 			</el-col>
 			<el-col :span="20" style="height: 100%;overflow: auto;">
@@ -52,8 +59,11 @@
 		computed: {
 			defaultActive: function(){
 				return this.$route.path.replace('/', '');
+			},
+			adminRole:function(){
+				return this.$store.state.adminInfo.role;
 			}
-		},
+		}
     }
 </script>
 

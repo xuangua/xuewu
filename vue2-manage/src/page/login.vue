@@ -12,6 +12,15 @@
 					<el-form-item prop="password">
 						<el-input type="password" placeholder="密码" v-model="loginForm.password"></el-input>
 					</el-form-item>
+					<div v-if="luosimaoSiteKey" style="min-height: 44px;">
+                    	<div class="l-captcha" data-width="100%" :data-site-key="luosimaoSiteKey" data-callback="luosimaoCallback"></div>
+                	</div>
+	                <p style="text-align: right;padding-right: 2px;margin-top:10px;">
+	                    <router-link  id="singup" to="/signup">立即注册</router-link> 
+	                    <!-- <a href="/signup" class="golang-common-link" style="margin-right: 12px;">立即注册</a> -->
+	                    <a href="/ac/pwdReset" class="golang-common-link">忘记密码</a>
+	                </p>
+
 					<el-form-item>
 				    	<el-button type="primary" @click="submitForm('loginForm')" class="submit_btn">登录</el-button>
 				  	</el-form-item>
@@ -23,6 +32,7 @@
 	  	</transition>
   	</div>
 </template>
+<!-- <script type="text/javascript" color="51,133,255" opacity='0.7' zIndex="1" count="80" src="/javascripts/canvasnest/canvas-nest.min.js"></script> -->
 
 <script>
 	import {login, getAdminInfo} from '@/api/getData'
@@ -31,6 +41,8 @@
 	export default {
 	    data(){
 			return {
+				luosimaoRes: '',
+				luosimaoSiteKey: this.$store.state.siteConfig.luosimaoSiteKey,
 				loginForm: {
 					username: '',
 					password: '',
@@ -52,10 +64,23 @@
 			if (!this.adminInfo.id) {
     			this.getAdminData()
     		}
+
+    		window.luosimaoCallback = (response) => {
+    			console.log('get a callback');
+                this.luosimaoRes = response
+            }
 		},
 		computed: {
 			...mapState(['adminInfo']),
 		},
+		head(){
+			return {
+				title: '登录',
+				script: [
+					{ src: '//captcha.luosimao.com/static/js/api.js' }
+				]
+			}
+        },
 		methods: {
 			...mapActions(['getAdminData']),
 			async submitForm(formName) {

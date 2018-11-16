@@ -2,7 +2,7 @@
     <section class="cart_module">
         <section v-if="!foods.specifications.length" class="cart_button">
             <transition name="showReduce">
-                <span @click="removeOutCart(foods.category_id, foods.item_id, foods.specfoods[0].food_id, foods.specfoods[0].name, foods.specfoods[0].price, '', foods.specfoods[0].packing_fee, foods.specfoods[0].sku_id, foods.specfoods[0].stock)" v-if="foodNum">
+                <span @click="removeOutCart(foods.food_category_id, foods.item_id, foods.specfoods[0].food_id, foods.specfoods[0].name, foods.specfoods[0].price, '', foods.specfoods[0].packing_fee, foods.specfoods[0].sku_id, foods.specfoods[0].stock)" v-if="foodNum">
                     <svg>
                         <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-minus"></use>
                     </svg>
@@ -11,7 +11,7 @@
             <transition name="fade">
                 <span class="cart_num" v-if="foodNum">{{foodNum}}</span>
             </transition>
-            <svg class="add_icon" @touchstart="addToCart(foods.category_id, foods.item_id, foods.specfoods[0].food_id, foods.specfoods[0].name, foods.specfoods[0].price, '', foods.specfoods[0].packing_fee, foods.specfoods[0].sku_id, foods.specfoods[0].stock, $event)">
+            <svg class="add_icon" @touchstart="addToCart(foods.food_category_id, foods.item_id, foods.specfoods[0].food_id, foods.specfoods[0].name, foods.specfoods[0].price, '', foods.specfoods[0].packing_fee, foods.specfoods[0].sku_id, foods.specfoods[0].stock, $event)">
                 <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-add"></use>
             </svg>
         </section>
@@ -54,11 +54,11 @@
             },
             //shopCart变化的时候重新计算当前商品的数量
             foodNum: function (){
-                let category_id = this.foods.category_id;
+                let food_category_id = this.foods.food_category_id;
                 let item_id = this.foods.item_id;
-                if (this.shopCart&&this.shopCart[category_id]&&this.shopCart[category_id][item_id]) {
+                if (this.shopCart&&this.shopCart[food_category_id]&&this.shopCart[food_category_id][item_id]) {
                     let num = 0;
-                    Object.values(this.shopCart[category_id][item_id]).forEach((item,index) => {
+                    Object.values(this.shopCart[food_category_id][item_id]).forEach((item,index) => {
                         num += item.num;
                     })
                     return num;
@@ -73,14 +73,14 @@
                 'ADD_CART','REDUCE_CART',
             ]),
             //移出购物车
-            removeOutCart(category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock){
+            removeOutCart(food_category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock){
                 if (this.foodNum > 0) {
-                    this.REDUCE_CART({shopid: this.shopId, category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock});
+                    this.REDUCE_CART({shopid: this.shopId, food_category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock});
                 }
             },
             //加入购物车，计算按钮位置。
-            addToCart(category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock, event){
-                this.ADD_CART({shopid: this.shopId, category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock});
+            addToCart(food_category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock, event){
+                this.ADD_CART({shopid: this.shopId, food_category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock});
                 let elLeft = event.target.getBoundingClientRect().left;
                 let elBottom = event.target.getBoundingClientRect().bottom;
                 this.showMoveDot.push(true);

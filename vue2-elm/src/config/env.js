@@ -8,16 +8,19 @@
  */
 
 let baseUrl = ''; 
-let routerMode = 'hash';
+let routerMode = 'history';
 let imgBaseUrl = '';
 
 
 if (process.env.NODE_ENV == 'development') {
+    //baseUrl = '//dev.xuangua.xyz';
+    baseUrl = 'https://wemall.wxapp.xuangua.xyz/api/xuewu';
+    // baseUrl = '//dev.xuangua.com/api/xuewu';
     imgBaseUrl = '/img/';
 
 }else if(process.env.NODE_ENV == 'production'){
-	baseUrl = '//localhost';
-    imgBaseUrl = '//localhost/img/';
+	baseUrl = '//dev.xuangua.xyz/api/xuewu';
+    imgBaseUrl = '//dev.xuangua.xyz/img/';
 }
 
 export {

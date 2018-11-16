@@ -143,7 +143,7 @@
     		return {
     			baseUrl,
     			baseImgPath,
-    			restaurant_id: 1,
+    			restaurant_id: 0,
     			categoryForm: {
     				categoryList: [],
     				categorySelect: '',
@@ -193,10 +193,13 @@
     		headTop,
     	},
     	created(){
+    		console.log(this.restaurant_id)
+    		console.log('this.$route.query.restaurant_id')
+    		console.log(this.$route.query.restaurant_id)
     		if (this.$route.query.restaurant_id) {
     			this.restaurant_id = this.$route.query.restaurant_id;
     		}else{
-    			this.restaurant_id = Math.ceil(Math.random()*10);
+    			// this.restaurant_id = Math.ceil(Math.random()*10);
     			this.$msgbox({
 		          title: '提示',
 		          message: '添加食品需要选择一个商铺，先去就去选择商铺吗？',
@@ -212,6 +215,7 @@
 				            type: 'info',
 				            message: '取消'
 				        });
+				        this.$router.push('/manage');
 		              	done();
 		            }
 		          }
@@ -221,12 +225,23 @@
     	},
     	computed: {
     		selectValue: function (){
+    			if (this.$route.query.restaurant_id) {
+		    		console.log('computed() this.$route.query.restaurant_id')
+			        console.log(this.$route.query.restaurant_id)
+    				this.restaurant_id = this.$route.query.restaurant_id;
+    			} else {
+    			    console.log('computed() this.$route.query.restaurant_id')
+			        console.log(this.$route.query.restaurant_id)
+			        this.restaurant_id = 0;
+    			}
     			return this.categoryForm.categoryList[this.categoryForm.categorySelect]||{}
     		}
     	},
     	methods: {
     		async initData(){
     			try{
+    				console.log('initData() this.$route.query.restaurant_id')
+    		        console.log(this.$route.query.restaurant_id)
     				const result = await getCategory(this.restaurant_id);
 	    			if (result.status == 1) {
 	    				result.category_list.map((item, index) => {
@@ -254,7 +269,7 @@
 						}
 						try{
 							const result = await addCategory(params);
-							if (result.status == 1) {
+							if (result.errNo == 0) {
 								this.initData();
 								this.categoryForm.name = '';
 								this.categoryForm.description = '';
@@ -263,7 +278,12 @@
 					            	type: 'success',
 					            	message: '添加成功'
 					          	});
-							}
+		                    }else{
+		                        this.$message({
+		                            type: 'error',
+		                            message: res.msg
+		                        });
+		                    }
 						}catch(err){
 							console.log(err)
 						}
@@ -315,6 +335,12 @@
 		        return '';
 		    },
 		    addFood(foodForm){
+		    	if (this.restaurant_id == 0) {
+					this.$message({
+		            	type: 'error',
+		            	message: '未指定店铺'
+		          	});
+		    	}
 		    	this.$refs[foodForm].validate(async (valid) => {
 					if (valid) {
 						const params = {
@@ -324,7 +350,7 @@
 						}
 						try{
 							const result = await addFood(params);
-							if (result.status == 1) {
+							if (result.errNo == 0) {
 								console.log(result)
 								this.$message({
 					            	type: 'success',
@@ -345,7 +371,7 @@
 							}else{
 								this.$message({
 					            	type: 'error',
-					            	message: result.message
+					            	message: result.msg
 					          	});
 							}
 						}catch(err){

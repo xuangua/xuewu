@@ -47,12 +47,12 @@
                 </section>
             </section>
             <section class="food_list">
-                <header v-if="checkoutData.cart.restaurant_info">
-                    <img :src="imgBaseUrl + checkoutData.cart.restaurant_info.image_path">
-                    <span>{{checkoutData.cart.restaurant_info.name}}</span>
+                <header v-if="checkoutData.cart.shop_info">
+                    <img :src="imgBaseUrl + checkoutData.cart.shop_info.image_path">
+                    <span>{{checkoutData.cart.shop_info.name}}</span>
                 </header>
                 <ul class="food_list_ul" v-if="checkoutData.cart.groups">
-                    <li v-for="item in checkoutData.cart.groups[0]" :key="item.id" class="food_item_style">
+                    <li v-for="item in checkoutData.cart.groups" :key="item.id" class="food_item_style">
                         <p class="food_name ellipsis">{{item.name}}</p>
                         <div class="num_price">
                             <span>x {{item.quantity}}</span>
@@ -143,6 +143,7 @@
             return {
                 geohash: '', //geohash位置信息
                 shopId: null, //商店id值
+                userShipAddrArray: null, 
                 showLoading: true, //显示加载动画
                 checkoutData: null,//数据返回值
                 shopCart: null,//购物车数据
@@ -154,10 +155,19 @@
             }
         },
         created(){
+            console.log('confirmOrder created()')
             //获取上个页面传递过来的geohash值
             this.geohash = this.$route.query.geohash;
             //获取上个页面传递过来的shopid值
             this.shopId = this.$route.query.shopId;
+            if (typeof this.shopId === 'string') {
+                console.log('string')
+                this.shopId = parseInt(this.shopId, 10);
+            }
+            if (typeof this.shopId === 'string') {
+                console.log('still string')
+            }
+            console.log(this.shopId)
             this.INIT_BUYCART();
             this.SAVE_SHOPID(this.shopId);
             //获取当前商铺购物车信息
@@ -200,7 +210,7 @@
         },
         methods: {
             ...mapMutations([
-                'INIT_BUYCART', 'SAVE_GEOHASH', 'CHOOSE_ADDRESS', 'NEED_VALIDATION', 'SAVE_CART_ID_SIG', 'SAVE_ORDER_PARAM', 'ORDER_SUCCESS', 'SAVE_SHOPID'
+                'INIT_BUYCART', 'SAVE_GEOHASH', 'CHOOSE_ADDRESS', 'NEED_VALIDATION', 'SAVE_CART_ID_SIG', 'SAVE_ORDER_PARAM', 'ORDER_SUCCESS', 'SAVE_ORDER', 'SAVE_SHOPID'
             ]),
             //初始化数据
             async initData(){
@@ -224,17 +234,34 @@
                     })
                 })
                 //检验订单是否满足条件
-                this.checkoutData = await checkout(this.geohash, [newArr], this.shopId);
+                let checkoutRes = await checkout(this.geohash, newArr, this.shopId);
+                this.checkoutData = checkoutRes.data.newCart;
+                console.log('confirmOrder this.checkoutData')
+                console.log(this.checkoutData)
+
                 this.SAVE_CART_ID_SIG({cart_id: this.checkoutData.cart.id, sig:  this.checkoutData.sig})
                 this.initAddress();
                 this.showLoading = false;
             },
             //获取地址信息，第一个地址为默认选择地址
             async initAddress(){
+                console.log('come into initAddress')
+                console.log(this.userInfo)
                 if (this.userInfo && this.userInfo.user_id) {
-                    const addressRes = await getAddressList(this.userInfo.user_id);
-                    if (addressRes instanceof Array && addressRes.length) {
-                        this.CHOOSE_ADDRESS({address: addressRes[0], index: 0});
+                    const addressRes = await getAddressList(this.userInfo.user_id, this.checkoutData.cart.shop_info.school_name, this.checkoutData.cart.shop_info.school_campus_name);
+                    this.userShipAddrArray = addressRes.data.userShipAddrArray;
+                    console.log(this.userShipAddrArray)
+                    // //将当前所有地址访问有效无效两种
+                    // this.addressList.forEach(item => {
+                    //     if ((item.school_name == shopDetail.school_name) && (item.school_campus_name == shopDetail.school_campus_name)) {
+                    //         this.deliverable.push(item);
+                    //     }else{
+                    //         this.deliverdisable.push(item);
+                    //     }
+                    // })
+
+                    if (this.userShipAddrArray instanceof Array && this.userShipAddrArray.length) {
+                        this.CHOOSE_ADDRESS({address: this.userShipAddrArray[0], index: 0});
                     }
                 }
             },
@@ -259,6 +286,8 @@
             //确认订单
             async confrimOrder(){
                 //用户未登录时弹出提示框
+                console.log('confrimOrder.vue confrimOrder() --- this.userInfo')
+                console.log(this.userInfo)
                 if (!(this.userInfo && this.userInfo.user_id)) {
                     this.showAlert = true;
                     this.alertText = '请登录';
@@ -281,13 +310,17 @@
                 });
                 //发送订单信息
                 let orderRes = await placeOrders(this.userInfo.user_id, this.checkoutData.cart.id, this.choosedAddress.id, this.remarklist, this.checkoutData.cart.groups, this.geohash, this.checkoutData.sig);
-                //第一次下单的手机号需要进行验证，否则直接下单成功
-                if (orderRes.need_validation) {
-                    this.NEED_VALIDATION(orderRes);
-                    this.$router.push('/confirmOrder/userValidation');
-                }else{
-                    this.ORDER_SUCCESS(orderRes);
-                    this.$router.push('/confirmOrder/payment');
+                if (orderRes.errNo == 0) {
+                    //第一次下单的手机号需要进行验证，否则直接下单成功
+                    if (orderRes.need_validation) {
+                        this.NEED_VALIDATION(orderRes);
+                        this.$router.push('/confirmOrder/userValidation');
+                    }else{
+                        this.ORDER_SUCCESS(orderRes.data.newOrder);
+                        this.SAVE_ORDER(orderRes.data.newOrder);
+                        // this.$router.push('/confirmOrder/payment');
+                         window.location.href="/orderPay?orderid=" + orderRes.data.newOrder.id;
+                    }
                 }
             },
         },

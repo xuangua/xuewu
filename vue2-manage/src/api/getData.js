@@ -114,7 +114,7 @@ export const addCategory = data => fetch('/admin/shopping/addcategory', data, 'P
  * 添加食品
  */
 
-export const addFood = data => fetch('/admin/shopping/addfood', data, 'POST');
+export const addFood = data => fetch('/admin/shopping/addFood', data, 'POST');
 
 
 /**

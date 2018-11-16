@@ -2,7 +2,7 @@
     <div class="rating_page">
         <head-top head-title="在线支付" go-back='true'></head-top>
         <section class="show_time_amount">
-        	<section>
+            <section>
                 <header class="time_last">支付剩余时间</header>
                 <p class="time">{{remaining}}</p>
                 <footer class="order_detail" v-if="payDetail.resultData">
@@ -50,7 +50,7 @@
     export default {
       data(){
             return{
-               	payDetail: false, //付款信息详情
+                payDetail: false, //付款信息详情
                 wxPayParameters: {}, //提交微信支付的参数
                 showAlert: false,
                 alertText: null,
@@ -64,7 +64,19 @@
             alertTip,
         },
         created(){
-            this.initData();
+            //判断是否正确页面，如果不是讲进行刷新页面
+            console.log("this.$route.fullPath.")
+            console.log(this.$route.fullPath)
+            console.log("this.orderid")
+            console.log(this.orderid)
+            console.log("this.userInfo.user_id")
+            console.log(this.userInfo.user_id)
+            let id = this.orderid =  this.$route.query.orderid;
+            //判断是否正确页面，如果不是讲进行刷新页面
+            if(this.$route.fullPath.indexOf('/orderPay') < 0){
+                window.location.href="/OrderPay?orderid="+id;
+            }
+            // this.initData();
             //清除购物车中当前商铺的信息
             if (this.shopid) {
                 this.CLEAR_CART(this.shopid);
@@ -79,7 +91,7 @@
         props:[],
         computed: {
             ...mapState([
-                'orderMessage', 'userInfo', 'shopid', 'cartPrice'
+                'orderDetail', 'orderMessage', 'userInfo', 'shopid', 'cartPrice'
             ]),
             //时间转换
             remaining: function (){
@@ -100,7 +112,7 @@
             ]),
             //初始化信息
             async initData(){
-            	this.payDetail = await payRequest(this.orderMessage.order_id, this.userInfo.user_id);
+                this.payDetail = await payRequest(this.orderid, this.userInfo.user_id);
                 if (this.payDetail.message) {
                     this.showAlert = true;
                     this.alertText = this.payDetail.message;
@@ -121,26 +133,33 @@
             },
             //确认付款
             async confrimPay(){
-                this.showAlert = true;
-                this.alertText = '当前环境无法支付，请打开官方APP进行付款';
-                this.gotoOrders = true;
+                if (this.payWay ==1) {                    
+                    this.showAlert = true;
+                    this.alertText = '当前环境暂不支持支付宝，请打开官方APP进行付款';
+                    this.gotoOrders = true;
+                    return;
+                }
 
-                console.log(this.orderMessage)
-                let wxPayParamRes = await getWxPayParameters(this.orderMessage.order_id, this.userInfo.user_id);
+                console.log("this.orderDetail")
+                console.log(this.orderDetail)
+                let wxPayParamRes = await getWxPayParameters(this.orderid, this.userInfo.user_id);
                 if (wxPayParamRes.errNo == 0) {
-                    this.wxPayParameters = wxPayParamRes.wxPayParams
-                    if (parseInt(data[0].agent) < 5) {
-                        alert("您的微信版本低于5.0无法使用微信支付。");
-                        return;
-                    }
-
+                    console.log(wxPayParamRes)
+                    this.wxPayParameters = wxPayParamRes.wxPayJsdkConfig
+                    // if (parseInt(this.wxPayParameters.agent) < 5) {
+                    //     alert("您的微信版本低于5.0无法使用微信支付。");
+                    //     return;
+                    // }
+                    console.log("this.wxPayParameters")
+                    console.log(this.wxPayParameters)
                     WeixinJSBridge.invoke('getBrandWCPayRequest',{
-                        "appId" : data[0].appId, //公众号名称，由商户传入
-                        "timeStamp" : data[0].timeStamp, //时间戳，自 1970 年以来的秒数
-                        "nonceStr" : data[0].nonceStr, //随机串
-                        "package" : data[0].packageValue, //商品包信息
-                        "signType" : data[0].signType, //微信签名方式:
-                        "paySign" : data[0].paySign //微信签名
+                        debug:true, 
+                        "appId" : this.wxPayParameters.appId, //公众号名称，由商户传入
+                        "timeStamp" : this.wxPayParameters.timeStamp, //时间戳，自 1970 年以来的秒数
+                        "nonceStr" : this.wxPayParameters.nonceStr, //随机串
+                        "package" : this.wxPayParameters.package, //商品包信息
+                        "signType" : this.wxPayParameters.signType, //微信签名方式:
+                        "paySign" : this.wxPayParameters.paySign //微信签名
                     },function(res) {
                         /* 对于支付结果，res对象的err_msg值主要有3种，含义如下：(当然，err_msg的值不只这3种)
                          1、get_brand_wcpay_request:ok   支付成功后，微信服务器返回的值
@@ -152,15 +171,22 @@
                          */
                         // alert(res.err_msg);
                         if (res.err_msg == 'get_brand_wcpay_request:ok') {
-                            alert("支付成功！");
-                            window.location.href = data[0].sendUrl;
+                            // alert("支付成功！");
+                            this.showAlert = true;
+                            this.alertText = '支付成功！';                            
+                            window.location.href = this.wxPayParameters.sendUrl;
                         } else if (res.err_msg == "get_brand_wcpay_request:cancel") {
-                            alert("您已手动取消该订单支付。");
+                            // alert("您已手动取消该订单支付。");
+                            this.showAlert = true;
+                            this.alertText = '您已手动取消该订单支付。';
                         } else {
-                            alert("订单支付失败。");
+                            this.showAlert = true;
+                            this.alertText = '订单支付失败。';
+                            // alert("订单支付失败。");
                         }
                     });
                 } else {
+                    console.log('wxPayParamRes.errNo!=0')
                     this.showAlert = true;
                     this.alertText = wxPayParamRes.message;
                 }
@@ -193,7 +219,7 @@
         }
     }
     .show_time_amount{
-		background-color: #fff;
+        background-color: #fff;
         padding: .7rem;
         text-align: center;
         .time_last{
@@ -234,7 +260,7 @@
                 align-items: center;
                 .zhifubao{
                     @include wh(2rem, 2rem);
-                    background: url(../../../images/zhifubao.png) no-repeat;
+                    background: url(../../images/zhifubao.png) no-repeat;
                     background-size: 100% 100%;
                     margin-right: .2rem;
                 }

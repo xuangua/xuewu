@@ -6,7 +6,7 @@ import {getStore} from '../config/mUtils'
  */
 
 export const cityGuess = () => fetch('/v1/cities', {
-	type: 'guess'
+    type: 'guess'
 });
 
 
@@ -15,7 +15,7 @@ export const cityGuess = () => fetch('/v1/cities', {
  */
 
 export const hotcity = () => fetch('/v1/cities', {
-	type: 'hot'
+    type: 'hot'
 });
 
 
@@ -24,7 +24,7 @@ export const hotcity = () => fetch('/v1/cities', {
  */
 
 export const groupcity = () => fetch('/v1/cities', {
-	type: 'group'
+    type: 'group'
 });
 
 
@@ -40,9 +40,9 @@ export const currentcity = number => fetch('/v1/cities/' + number);
  */
 
 export const searchplace = (cityid, value) => fetch('/v1/pois', {
-	type: 'search',
-	city_id: cityid,
-	keyword: value
+    type: 'search',
+    city_id: cityid,
+    keyword: value
 });
 
 
@@ -50,17 +50,17 @@ export const searchplace = (cityid, value) => fetch('/v1/pois', {
  * 获取msite页面地址信息
  */
 
-export const msiteAddress = geohash => fetch('/v2/pois/' + geohash);
+export const msiteAddress = geohash => fetch('/customer/get_pois/' + geohash);
 
 
 /**
  * 获取msite页面食品分类列表
  */
 
-export const msiteFoodTypes = geohash => fetch('/v2/index_entry', {
-	geohash,
-	group_type: '1',
-	'flags[]': 'F'
+export const msiteFoodTypes = geohash => fetch('/customer/getShopCategory/index_entry', {
+    geohash,
+    group_type: '1',
+    'flags[]': 'F'
 });
 
 
@@ -68,26 +68,28 @@ export const msiteFoodTypes = geohash => fetch('/v2/index_entry', {
  * 获取msite商铺列表
  */
 
-export const shopList = (latitude, longitude, offset, restaurant_category_id = '', restaurant_category_ids = '', order_by = '', delivery_mode = '', support_ids = []) => {
-	let supportStr = '';
-	support_ids.forEach(item => {
-		if (item.status) {
-			supportStr += '&support_ids[]=' + item.id;
-		}
-	});
-	let data = {
-		latitude,
-		longitude,
-		offset,
-		limit: '20',
-		'extras[]': 'activities',
-		keyword: '',
-		restaurant_category_id,
-		'restaurant_category_ids[]': restaurant_category_ids,
-		order_by,
-		'delivery_mode[]': delivery_mode + supportStr
-	};
-	return fetch('/shopping/restaurants', data);
+export const shopList = (latitude, longitude, school_name, school_campus_name, offset, restaurant_category_id = '', restaurant_category_ids = '', order_by = 4, delivery_mode = '', support_ids = []) => {
+    let supportStr = '';
+    support_ids.forEach(item => {
+        if (item.status) {
+            supportStr += '&support_ids[]=' + item.id;
+        }
+    });
+    let data = {
+        latitude,
+        longitude,
+        offset,
+        limit: '20',
+        'extras[]': 'activities',
+        keyword: '',
+        restaurant_category_id,
+        'restaurant_category_ids[]': restaurant_category_ids,
+        order_by,
+        'delivery_mode[]': delivery_mode + supportStr,
+        school_name,
+        school_campus_name
+    };
+    return fetch('/customer/shopping/getCustomerUserShopList', data);
 };
 
 
@@ -96,10 +98,10 @@ export const shopList = (latitude, longitude, offset, restaurant_category_id = '
  */
 
 export const searchRestaurant = (geohash, keyword) => fetch('/v4/restaurants', {
-	'extras[]': 'restaurant_activity',
-	geohash,
-	keyword,
-	type: 'search'
+    'extras[]': 'restaurant_activity',
+    geohash,
+    keyword,
+    type: 'search'
 });
 
 
@@ -108,8 +110,8 @@ export const searchRestaurant = (geohash, keyword) => fetch('/v4/restaurants', {
  */
 
 export const foodCategory = (latitude, longitude) => fetch('/shopping/v2/restaurant/category', {
-	latitude,
-	longitude
+    latitude,
+    longitude
 });
 
 
@@ -118,9 +120,9 @@ export const foodCategory = (latitude, longitude) => fetch('/shopping/v2/restaur
  */
 
 export const foodDelivery = (latitude, longitude) => fetch('/shopping/v1/restaurants/delivery_modes', {
-	latitude,
-	longitude,
-	kw: ''
+    latitude,
+    longitude,
+    kw: ''
 });
 
 
@@ -129,9 +131,9 @@ export const foodDelivery = (latitude, longitude) => fetch('/shopping/v1/restaur
  */
 
 export const foodActivity = (latitude, longitude) => fetch('/shopping/v1/restaurants/activity_attributes', {
-	latitude,
-	longitude,
-	kw: ''
+    latitude,
+    longitude,
+    kw: ''
 });
 
 
@@ -140,8 +142,8 @@ export const foodActivity = (latitude, longitude) => fetch('/shopping/v1/restaur
  */
 
 export const shopDetails = (shopid, latitude, longitude) => fetch('/shopping/restaurant/' + shopid, {
-	latitude,
-	longitude: longitude + '&extras[]=activities&extras[]=album&extras[]=license&extras[]=identification&extras[]=statistics'
+    latitude,
+    longitude: longitude + '&extras[]=activities&extras[]=album&extras[]=license&extras[]=identification&extras[]=statistics'
 });
 
 
@@ -150,8 +152,8 @@ export const shopDetails = (shopid, latitude, longitude) => fetch('/shopping/res
  * 获取shop页面菜单列表
  */
 
-export const foodMenu = restaurant_id => fetch('/shopping/v2/menu', {
-	restaurant_id
+export const getShopMenuFoods = shop_id => fetch('/customer/shopping/getShopMenuFoods', {
+    shop_id
 });
 
 
@@ -160,10 +162,10 @@ export const foodMenu = restaurant_id => fetch('/shopping/v2/menu', {
  */
 
 export const getRatingList = (shopid, offset, tag_name = '') => fetch('/ugc/v2/restaurants/' + shopid + '/ratings', {
-	has_content: true,
-	offset,
-	limit: 10,
-	tag_name
+    has_content: true,
+    offset,
+    limit: 10,
+    tag_name
 });
 
 
@@ -186,9 +188,9 @@ export const ratingTags = shopid => fetch('/ugc/v2/restaurants/' + shopid + '/ra
  */
 
 export const mobileCode = phone => fetch('/v4/mobile/verify_code/send', {
-	mobile: phone,
-	scene: 'login',
-	type: 'sms'
+    mobile: phone,
+    scene: 'login',
+    type: 'sms'
 }, 'POST');
 
 
@@ -204,8 +206,8 @@ export const getcaptchas = () => fetch('/v1/captchas', {},'POST');
  */
 
 export const checkExsis = (checkNumber, type) => fetch('/v1/users/exists', {
-	[type]: checkNumber,
-	type
+    [type]: checkNumber,
+    type
 });
 
 
@@ -214,12 +216,12 @@ export const checkExsis = (checkNumber, type) => fetch('/v1/users/exists', {
  */
 
 export const sendMobile = (sendData, captcha_code, type, password) => fetch('/v1/mobile/verify_code/send', {
-	action: "send",
-	captcha_code,
-	[type]: sendData,
-	type: "sms",
-	way: type,
-	password,
+    action: "send",
+    captcha_code,
+    [type]: sendData,
+    type: "sms",
+    way: type,
+    password,
 }, 'POST');
 
 
@@ -227,11 +229,11 @@ export const sendMobile = (sendData, captcha_code, type, password) => fetch('/v1
  * 确认订单
  */
 
-export const checkout = (geohash, entities, shopid) => fetch('/v1/carts/checkout', {
-	come_from: "web",
-	geohash,
-	entities,
-	restaurant_id: shopid,
+export const checkout = (geohash, entities, shopid) => fetch('/customer/shopping/carts/checkout', {
+    come_from: "web",
+    geohash,
+    entities,
+    shop_id: shopid,
 }, 'POST');
 
 
@@ -240,7 +242,7 @@ export const checkout = (geohash, entities, shopid) => fetch('/v1/carts/checkout
  */
 
 export const getRemark = (id, sig) => fetch('/v1/carts/' + id + '/remarks', {
-	sig
+    sig
 });
 
 
@@ -249,7 +251,7 @@ export const getRemark = (id, sig) => fetch('/v1/carts/' + id + '/remarks', {
  */
 
 export const getAddress = (id, sig) => fetch('/v1/carts/' + id + '/addresses', {
-	sig
+    sig
 });
 
 
@@ -258,8 +260,8 @@ export const getAddress = (id, sig) => fetch('/v1/carts/' + id + '/addresses', {
  */
 
 export const searchNearby = keyword => fetch('/v1/pois', {
-	type: 'nearby',
-	keyword
+    type: 'nearby',
+    keyword
 });
 
 
@@ -267,17 +269,25 @@ export const searchNearby = keyword => fetch('/v1/pois', {
  * 添加地址
  */
 
-export const postAddAddress = (userId, address, address_detail, geohash, name, phone, phone_bk, poi_type, sex, tag, tag_type) => fetch('/v1/users/' + userId + '/addresses', {
-	address,
-	address_detail,
-	geohash,
-	name,
-	phone,
-	phone_bk,
-	poi_type,
-	sex,
-	tag,
-	tag_type,
+export const postAddAddress = (userId, province, city, district, school_name, school_campus_name, school_dormarea_name, school_dorm_name, school_dorm_room_name, geohash, name, phone, phone_bk, poi_type, sex, tag, tag_type) => fetch('/customer/addShipAddr/' + userId, {
+    province,
+    city,
+    district,
+    school_name,
+    school_campus_name,
+    school_dormarea_name,
+    school_dorm_name,
+    school_dorm_room_name,
+    // address,
+    // address_detail,
+    geohash,
+    name,
+    phone,
+    phone_bk,
+    poi_type,
+    sex,
+    tag,
+    tag_type,
 }, 'POST');
 
 
@@ -285,15 +295,15 @@ export const postAddAddress = (userId, address, address_detail, geohash, name, p
  * 下订单
  */
 
-export const placeOrders = (user_id, cart_id, address_id, description, entities, geohash, sig) => fetch('/v1/users/' + user_id + '/carts/' + cart_id + '/orders', {
-	address_id,
-	come_from: "mobile_web",
-	deliver_time: "",
-	description,
-	entities,
-	geohash,
-	paymethod_id: 1,
-	sig,
+export const placeOrders = (user_id, cart_id, address_id, description, entities, geohash, sig) => fetch('/customer/users/' + user_id + '/carts/' + cart_id + '/orders', {
+    address_id,
+    come_from: "mobile_web",
+    deliver_time: "",
+    description,
+    entities,
+    geohash,
+    paymethod_id: 1,
+    sig,
 }, 'POST');
 
 
@@ -302,8 +312,8 @@ export const placeOrders = (user_id, cart_id, address_id, description, entities,
  */
 
 export const rePostVerify = (cart_id, sig, type) => fetch('/v1/carts/' + cart_id + '/verify_code', {
-	sig,
-	type,
+    sig,
+    type,
 }, 'POST');
 
 
@@ -313,26 +323,26 @@ export const rePostVerify = (cart_id, sig, type) => fetch('/v1/carts/' + cart_id
  */
 
 export const validateOrders = ({
-	user_id,
-	cart_id,
-	address_id,
-	description,
-	entities,
-	geohash,
-	sig,
-	validation_code,
-	validation_token
+    user_id,
+    cart_id,
+    address_id,
+    description,
+    entities,
+    geohash,
+    sig,
+    validation_code,
+    validation_token
 }) => fetch('/v1/users/' + user_id + '/carts/' + cart_id + '/orders', {
-	address_id,
-	come_from: "mobile_web",
-	deliver_time: "",
-	description,
-	entities,
-	geohash,
-	paymethod_id: 1,
-	sig,
-	validation_code,
-	validation_token,
+    address_id,
+    come_from: "mobile_web",
+    deliver_time: "",
+    description,
+    entities,
+    geohash,
+    paymethod_id: 1,
+    sig,
+    validation_code,
+    validation_token,
 }, 'POST');
 
 
@@ -340,12 +350,21 @@ export const validateOrders = ({
  * 重新发送订单验证码
  */
 
-export const payRequest = (merchantOrderNo, userId) => fetch('/payapi/payment/queryOrder', {
-	merchantId: 5,
-	merchantOrderNo,
-	source: 'MOBILE_WAP',
-	userId,
-	version: '1.0.0',
+export const payRequest = (merchantOrderNo, userId) => fetch('/customer/payapi/payment/queryOrder', {
+    merchantId: 5,
+    merchantOrderNo,
+    source: 'MOBILE_WAP',
+    userId,
+    version: '1.0.0',
+});
+
+/**
+ * 重新发送订单验证码
+ */
+
+export const getWxPayParameters = (merchantOrderNo, user_id) => fetch('/customer/payapi/getWxPayParameters', {
+    merchantOrderNo,
+    user_id,
 });
 
 
@@ -363,8 +382,8 @@ export const getService = () => fetch('/v3/profile/explain');
 */
 
 export const vipCart = (id, number, password) => fetch('/member/v1/users/' + id + '/delivery_card/physical_card/bind',{
-	number,
-	password
+    number,
+    password
 }, 'POST')
 
 
@@ -390,8 +409,8 @@ export const getExpired = id => fetch('/promotion/v2/users/' + id + '/expired_ho
 */
 
 export const exChangeHongbao = (id, exchange_code, captcha_code) => fetch('/v1/users/' + id + '/hongbao/exchange',{
-	exchange_code,
-	captcha_code,
+    exchange_code,
+    captcha_code,
 }, 'POST');
 
 
@@ -407,9 +426,9 @@ export const getUser = () => fetch('/v1/user', {user_id: getStore('user_id')});
  */
 
 var sendLogin = (code, mobile, validate_token) => fetch('/v1/login/app_mobile', {
-	code,
-	mobile,
-	validate_token
+    code,
+    mobile,
+    validate_token
 }, 'POST');
 
 
@@ -417,9 +436,10 @@ var sendLogin = (code, mobile, validate_token) => fetch('/v1/login/app_mobile', 
  * 获取订单列表
  */
 
-export const getOrderList = (user_id, offset) => fetch('/bos/v2/users/' + user_id + '/orders', {
-	limit: 10,
-	offset,
+export const getOrderList = (user_id, offset) => fetch('/customer/getUserOrderList', {
+    user_id,
+    limit: 10,
+    offset,
 });
 
 
@@ -427,22 +447,28 @@ export const getOrderList = (user_id, offset) => fetch('/bos/v2/users/' + user_i
  * 获取订单详情
  */
 
-export const getOrderDetail = (user_id, orderid) => fetch('/bos/v1/users/' + user_id + '/orders/' + orderid + '/snapshot');
-
+// export const getOrderDetail = (user_id, orderid) => fetch('/bos/v1/users/' + user_id + '/orders/' + orderid + '/snapshot');
+export const getOrderDetail = (user_id, orderid) => fetch('/customer/payapi/payment/queryOrder', {
+    merchantOrderNo: orderid,
+    user_id,
+});
 
 /**
 *个人中心里编辑地址
 */
 
-export const getAddressList = (user_id) => fetch('/v1/users/'+user_id+'/addresses')
+export const getAddressList = (user_id, school_name, school_campus_name) => fetch('/customer/getShipAddrList/'+user_id, {
+    school_name,
+    school_campus_name
+})
 
 /**
 *个人中心里搜索地址
 */
 
 export const getSearchAddress = (keyword) => fetch('v1/pois',{
-	keyword:keyword,
-	type:'nearby'
+    keyword:keyword,
+    type:'nearby'
 })
 
 /**
@@ -469,3 +495,32 @@ export const signout = () => fetch('/v2/signout');
  * 改密码
  */
 export const changePassword = (username, oldpassWord, newpassword, confirmpassword, captcha_code) => fetch('/v2/changepassword', {username, oldpassWord, newpassword, confirmpassword, captcha_code}, 'POST');
+
+/**
+ * 通过code获取用户openid
+ */
+export const getWxUserInfo = (code) => fetch('/wechat/getWxUserInfo', {
+    code: code
+});
+
+/**
+ * 用户使用wxUserInfo登陆 后端建立cookie/session，并返回用户数据库信息
+ */
+export const loginWithWxUserInfo = (wxUserInfo) => fetch('/wechat/loginWithWxUserInfo', {
+    openid: wxUserInfo.openid,
+    nickname: wxUserInfo.nickname,
+    sex: wxUserInfo.sex,
+    province: wxUserInfo.province,
+    city: wxUserInfo.city,
+    country: wxUserInfo.country,
+    headimgurl: wxUserInfo.headimgurl,
+    privilege: wxUserInfo.privilege,
+    unionid: wxUserInfo.unionid
+}, 'POST');
+
+/**
+ * 通过后台获取 wx jssdk config data
+ */
+export const getWxConfigNeededData = (accessurl) => fetch('/wechat/wxAuthConfig', {
+    accessurl: accessurl
+});

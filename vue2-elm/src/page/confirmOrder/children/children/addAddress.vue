@@ -33,10 +33,12 @@
                 </section>
             </section>
             <section class="section_list">
-                <span class="section_left">送餐地址</span>
+                <span class="section_left">配送地址</span>
                 <section class="section_right">
-                    <router-link to="/confirmOrder/chooseAddress/addAddress/searchAddress" tag="div" class="choose_address">{{searchAddress? searchAddress.name : '小区/写字楼/学校等'}}</router-link>
-                    <input type="text" name="address_detail" placeholder="详细地址（如门牌号等）" v-model="address_detail" class="input_style">
+                    <!-- <router-link to="/confirmOrder/chooseAddress/addAddress/searchAddress" tag="div" class="choose_address">{{searchAddress? searchAddress.name : '小区/写字楼/学校等'}}</router-link> -->
+                    <input type="text" name="school_dormarea_name" placeholder="宿舍区域名（如南区学生宿舍等）" v-model="school_dormarea_name" class="input_style">
+                    <input type="text" name="school_dorm_name" placeholder="宿舍名（如南一舍等）" v-model="school_dorm_name" class="input_style">
+                    <input type="text" name="address_detail" placeholder="宿舍房间号（如101等）" v-model="address_detail" class="input_style">
 
                 </section>
             </section>
@@ -67,7 +69,9 @@
                 name: null, //姓名
                 sex: 1, //性别
                 phone: null, //电话
-                address_detail: null, //详细地址
+                school_dormarea_name: null, // 宿舍区域名（如南区学生宿舍等）
+                school_dorm_name: null, // 宿舍名（如南一舍等）
+                address_detail: null, //详细地址, 宿舍房间号（如101等）
                 tag: '', //备注
                 tag_type: 1, //备注类型
                 phone_bk: false, //是否选择备注电话
@@ -86,7 +90,7 @@
         },
         computed: {
             ...mapState([
-                'searchAddress', 'geohash', 'userInfo',
+                'searchAddress', 'geohash', 'userInfo','shopDetail'
             ]),
         },
         methods: {
@@ -108,9 +112,9 @@
                 }else if(!this.phone){
                     this.showAlert = true;
                     this.alertText = '请输入电话号码'
-                }else if(!this.searchAddress){
-                    this.showAlert = true;
-                    this.alertText = '请选择地址'
+                // }else if(!this.searchAddress){
+                //     this.showAlert = true;
+                //     this.alertText = '请选择地址'
                 }else if(!this.address_detail){
                     this.showAlert = true;
                     this.alertText = '请输入详细地址'
@@ -122,14 +126,31 @@
                 }else if(this.tag == '公司'){
                     this.tag_type = 4;
                 }
-                let res = await postAddAddress(this.userInfo.user_id, this.searchAddress.name, this.address_detail, this.geohash, this.name, this.phone, this.anntherPhoneNumber, 0, this.sex, this.tag, this.tag_type);
+                // let total_address_name = this.shopDetail.school_name + '(' + this.shopDetail.school_campus_name + ')' + this.shopDetail.school_dormarea_name + this.shopDetail.school_dorm_name + this.address_detail;
+                // let shipAddr = {
+                //     name: this.name,
+                //     sex: this.sex,
+                //     phone: this.phone,
+                //     tag: this.tag,
+                //     address_detail: total_address_name,
+                //     province: this.shopDetail.province,
+                //     city: this.shopDetail.city,
+                //     district: this.shopDetail.district,
+                //     school_name: this.shopDetail.school_name,
+                //     school_campus_name: this.shopDetail.school_campus_name,
+                //     school_dormarea_name: this.shopDetail.school_dormarea_name,
+                //     school_dorm_name: this.shopDetail.school_dorm_name,
+                //     school_dorm_room_name: this.address_detail,
+                // };
+                console.log(this.name)
+                let res = await postAddAddress(this.userInfo.user_id, this.shopDetail.province,this.shopDetail.city,this.shopDetail.district,this.shopDetail.school_name, this.shopDetail.school_campus_name, this.shopDetail.school_dormarea_name, this.shopDetail.school_dorm_name, this.address_detail, this.geohash, this.name, this.phone, this.anntherPhoneNumber, 0, this.sex, this.tag, this.tag_type);
                 //保存成功返沪上一页，否则弹出提示框
-                if (res.message) {
-                    this.showAlert = true;
-                    this.alertText = res.message;
-                }else {
+                if (res.errNo == 0) {
                     this.CONFIRM_ADDRESS(1);
                     this.$router.go(-1);
+                }else {
+                    this.showAlert = true;
+                    this.alertText = res.msg;
                 }
             },
         }

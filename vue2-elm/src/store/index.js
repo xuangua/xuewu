@@ -3,12 +3,16 @@ import Vuex from 'vuex'
 import mutations from './mutations'
 import actions from './action'
 import getters from './getters'
+import createPersistedState from "vuex-persistedstate"
 
 Vue.use(Vuex)
 
 const state = {
 	latitude: '', // 当前位置纬度
 	longitude: '', // 当前位置经度
+	realAddrName: '',
+	shopAddrName: '',
+	decidedSchoolData: {},
 	cartList: {}, // 加入购物车的商品列表
 	shopDetail: null, //商家详情信息
 	userInfo: null, //用户信息
@@ -27,7 +31,7 @@ const state = {
 	orderParam: null,//订单的参数
 	orderMessage: null, //订单返回的信息
 	orderDetail: null, //订单详情
-	login: true,//是否登录
+	login: false,//是否登录
 	imgPath:null,//头像地址
 	removeAddress:[],//移除地址
 	addAddress:'',		//新增地址
@@ -40,4 +44,14 @@ export default new Vuex.Store({
 	getters,
 	actions,
 	mutations,
+	plugins: [createPersistedState({
+		storage: window.sessionStorage,
+		reducer(val) {
+			return {
+			    // 只储存state中的 userInfo, login, 
+				userInfo: val.userInfo,
+				login: val.login
+			}
+		}
+	})]
 })

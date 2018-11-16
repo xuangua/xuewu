@@ -21,18 +21,20 @@
                             </p>
                         </header>
                         <section class="order_basket">
-                            <p class="order_name ellipsis">{{item.basket.group[0][0].name}}{{item.basket.group[0].length > 1 ? ' 等' + item.basket.group[0].length + '件商品' : ''}}</p>
+                            <p class="order_name ellipsis">{{item.basket.groups[0].name}}{{item.basket.groups.length > 1 ? ' 等' + item.basket.groups.length + '件商品' : ''}}</p>
                             <p class="order_amount">¥{{item.total_amount.toFixed(2)}}</p>
                         </section>
                     </section>
                     <div class="order_again">
-                        <compute-time v-if="item.status_bar.title == '等待支付'" :time="item.time_pass"></compute-time>
+                        <compute-time v-if="item.status_bar.title == '等待支付'" :time="item.time_pass" :orderData="item"></compute-time>
                         <router-link :to="{path: '/shop', query: {geohash, id: item.restaurant_id}}" tag="span" class="buy_again" v-else>再来一单</router-link>
                     </div>
                 </section>
             </li>
         </ul>
         <foot-guide></foot-guide>
+        <loading v-if="showLoading"></loading>
+        <alert-tip v-if="showAlert" @closeTip="showAlert = false" :alertText="alertText"></alert-tip>
         <transition name="loading">
             <loading v-show="showLoading"></loading>
         </transition>
@@ -53,11 +55,14 @@
     import {getOrderList} from 'src/service/getData'
     import {loadMore} from 'src/components/common/mixin'
     import {imgBaseUrl} from 'src/config/env'
+    import alertTip from 'src/components/common/alertTip'
 
 
     export default {
       data(){
             return{
+                showAlert: false, //弹出框
+                alertText: null, //弹出框内容
                 orderList: null, //订单列表
                 offset: 0, 
                 preventRepeat: false,  //防止重复获取
@@ -74,6 +79,7 @@
             footGuide,
             loading,
             computeTime,
+            alertTip,
         },
         computed: {
             ...mapState([
@@ -88,10 +94,13 @@
             async initData(){
                 if (this.userInfo && this.userInfo.user_id) {
                     let res = await getOrderList(this.userInfo.user_id, this.offset);
-                    this.orderList = [...res];
+                    this.orderList = [...res.userOrderList];
+                    console.log(this.orderList)
                     this.hideLoading();
                 }else{
                     this.hideLoading();
+                    this.showAlert = true;
+                    this.alertText = '请登录';
                 }
             },
             //加载更多

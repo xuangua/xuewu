@@ -1,5 +1,7 @@
 import App from '../App'
 
+const wxauth = r => require.ensure([], () => r(require('../page/login/wxauth')), 'wxauth')
+const wxlogin = r => require.ensure([], () => r(require('../page/login/wxlogin')), 'wxlogin')
 const home = r => require.ensure([], () => r(require('../page/home/home')), 'home')
 const city = r => require.ensure([], () => r(require('../page/city/city')), 'city')
 const msite = r => require.ensure([], () => r(require('../page/msite/msite')), 'msite')
@@ -10,6 +12,7 @@ const profile = r => require.ensure([], () => r(require('../page/profile/profile
 const forget = r => require.ensure([], () => r(require('../page/forget/forget')), 'forget')
 const order = r => require.ensure([], () => r(require('../page/order/order')), 'order')
 const orderDetail = r => require.ensure([], () => r(require('../page/order/children/orderDetail')), 'orderDetail')
+// const orderPay = r => require.ensure([], () => r(require('../page/order/children/orderPay')), 'orderPay')
 const vipcard = r => require.ensure([], () => r(require('../page/vipcard/vipcard')), 'vipcard')
 const invoiceRecord = r => require.ensure([], () => r(require('../page/vipcard/children/invoiceRecord')), 'invoiceRecord')
 const useCart = r => require.ensure([], () => r(require('../page/vipcard/children/useCart')), 'useCart')
@@ -45,7 +48,7 @@ const service = r => require.ensure([], () => r(require('../page/service/service
 const questionDetail = r => require.ensure([], () => r(require('../page/service/children/questionDetail')), 'questionDetail')
 const find = r => require.ensure([], () => r(require('../page/find/find')), 'find')
 const download = r => require.ensure([], () => r(require('../page/download/download')), 'download')
-
+const orderPay = r => require.ensure([], () => r(require('../page/pay/orderPay')), 'orderPay')
 
 
 
@@ -53,10 +56,20 @@ export default [{
     path: '/',
     component: App, //顶层路由，对应index.html
     children: [ //二级路由。对应App.vue
-        //地址为空时跳转home页面
+        //地址为空时跳转wxlogin页面
         {
             path: '',
-            redirect: '/home'
+            redirect: '/wxlogin'
+        },
+        //wxauth
+        {
+            path: '/wxauth',
+            component: wxauth
+        },
+        //首页wxlogin
+        {
+            path: '/wxlogin',
+            component: wxlogin
         },
         //首页城市列表页
         {
@@ -174,7 +187,10 @@ export default [{
             children: [{
                 path: 'orderDetail', //订单详情页
                 component: orderDetail,
-            }, ]
+            }, {
+                path: 'orderPay', //订单详情页
+                component: orderPay,
+            },]
         },
         //vip卡页
         {
@@ -248,6 +264,12 @@ export default [{
                 path: 'detail', //积分说明
                 component: pointsDetail,
             }, ]
+        },
+        //订单支付
+        {
+            path: '/orderPay',
+            component:orderPay,
+            // name:'orderPay'
         },
     ]
 }]

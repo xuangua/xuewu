@@ -13,10 +13,14 @@ let baseImgPath;
 if (process.env.NODE_ENV == 'development') {
     //baseUrl = '//dev.xuangua.xyz';
     baseUrl = '//dev.xuangua.com/api/xuewu';
+    // baseUrl = '//wemall.wxapp.xuangua.xyz/api/xuewu';
     baseImgPath = '/img/';
 }else{
-    baseUrl = '//dev.xuangua.com/api/xuewu';
+    baseUrl = '//dev.xuangua.xyz/api/xuewu';
     baseImgPath = '//dev.xuangua.xyz/img/';
+    // baseImgPath = '//dev.xuangua.com/img/';
+    // baseUrl = '//wemall.wxapp.xuangua.xyz/api/xuewu';
+    // baseImgPath = '//wemall.wxapp.xuangua.xyz/img/';
 }
 
 export {

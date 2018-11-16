@@ -20,7 +20,7 @@
                         </svg>
                     </router-link>
                     <ul class="food_list_ul">
-                        <li v-for="item in orderDetail.basket.group[0]">
+                        <li v-for="item in orderDetail.basket.groups[0]">
                             <p class="food_name ellipsis">{{item.name}}</p>
                             <div class="quantity_price">
                                 <span>X{{item.quantity}}</span>
@@ -121,7 +121,8 @@
         methods: {
             async initData(){
                 if (this.userInfo && this.userInfo.user_id) {
-                    this.orderData = await getOrderDetail(this.userInfo.user_id, this.orderDetail.unique_id);
+                    let orderRes = await getOrderDetail(this.userInfo.user_id, this.orderDetail.unique_id);
+                    this.orderData = orderRes.OrderData
                     this.showLoading = false;
                     this.$nextTick(() => {
                         new BScroll('#scroll_section', {  

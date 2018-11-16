@@ -10,6 +10,9 @@
 					<el-form-item label="校区名称" prop="school_campus_name">
 						<el-input v-model="formData.school_campus_name" ></el-input>
 					</el-form-item>
+					<el-form-item label="宿舍区名称" prop="school_dormarea_name">
+						<el-input v-model="formData.school_dormarea_name"></el-input>
+					</el-form-item>
 					<el-form-item label="宿舍名称" prop="school_dorm_name">
 						<el-input v-model="formData.school_dorm_name"></el-input>
 					</el-form-item>
@@ -33,8 +36,8 @@
     			formData: {
 					school_name: '', 
 					school_campus_name: '', 
+					school_dormarea_name: '',
 					school_dorm_name: '',
-					
 		        },
 		        rules: {
 					school_name: [
@@ -42,6 +45,9 @@
 					],
 					school_campus_name: [
 						{ required: true, message: '请输入校区名称', trigger: 'blur' }
+					],
+					school_dormarea_name: [
+						{ required: true, message: '请输入宿舍区名称', trigger: 'blur' }
 					],
 					school_dorm_name: [
 						{ required: true, message: '请输入宿舍名称',trigger: 'blur' },
@@ -69,6 +75,7 @@
 					          	this.formData = {
 									school_name: '', //店铺名称
 									school_campus_name: '', 
+									school_dormarea_name: '', 
 									school_dorm_name: ''
 						        };
 							}else{

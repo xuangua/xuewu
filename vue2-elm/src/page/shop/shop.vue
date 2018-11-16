@@ -176,13 +176,13 @@
                                             <span>{{item.price}}</span>
                                         </div>
                                         <section class="cart_list_control">
-                                            <span @click="removeOutCart(item.category_id, item.item_id, item.food_id, item.name, item.price, item.specs)">
+                                            <span @click="removeOutCart(item.food_category_id, item.item_id, item.food_id, item.name, item.price, item.specs)">
                                                 <svg>
                                                     <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-minus"></use>
                                                 </svg>
                                             </span>
                                             <span class="cart_num">{{item.num}}</span>
-                                            <svg class="cart_add" @click="addToCart(item.category_id, item.item_id, item.food_id, item.name, item.price, item.specs)">
+                                            <svg class="cart_add" @click="addToCart(item.food_category_id, item.item_id, item.food_id, item.name, item.price, item.specs)">
                                                 <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-add"></use>
                                             </svg>
                                         </section>
@@ -202,7 +202,8 @@
                         <section>
 
                             <header class="rating_header">
-                                <section class="rating_header_left">
+                                <!-- TODO: enable rating -->
+<!--                                 <section class="rating_header_left">
                                     <p>{{shopDetailData.rating}}</p>
                                     <p>综合评价</p>
                                     <p>高于周边商家{{(ratingScoresData.compare_rating*100).toFixed(1)}}%</p>
@@ -222,7 +223,7 @@
                                         <span>送达时间</span>
                                         <span class="delivery_time">{{shopDetailData.order_lead_time}}分钟</span>
                                     </p>
-                                </section>
+                                </section> -->
                             </header>
                             <ul class="tag_list_ul">
                                 <li v-for="(item, index) in ratingTagsList" :key="index" :class="{unsatisfied: item.unsatisfied, tagActivity: ratingTageIndex == index}" @click="changeTgeIndex(index, item.name)">{{item.name}}({{item.count}})</li>
@@ -285,7 +286,7 @@
                             <span>¥ </span>
                             <span>{{choosedFoods.specfoods[specsIndex].price}}</span>
                         </div>
-                        <div class="specs_addto_cart" @click="addSpecs(choosedFoods.category_id, choosedFoods.item_id, choosedFoods.specfoods[specsIndex].food_id, choosedFoods.specfoods[specsIndex].name, choosedFoods.specfoods[specsIndex].price, choosedFoods.specifications[0].values[specsIndex], choosedFoods.specfoods[specsIndex].packing_fee, choosedFoods.specfoods[specsIndex].sku_id, choosedFoods.specfoods[specsIndex].stock)">加入购物车</div>
+                        <div class="specs_addto_cart" @click="addSpecs(choosedFoods.food_category_id, choosedFoods.item_id, choosedFoods.specfoods[specsIndex].food_id, choosedFoods.specfoods[specsIndex].name, choosedFoods.specfoods[specsIndex].price, choosedFoods.specifications[0].values[specsIndex], choosedFoods.specfoods[specsIndex].packing_fee, choosedFoods.specfoods[specsIndex].sku_id, choosedFoods.specfoods[specsIndex].stock)">加入购物车</div>
                     </footer>
                 </div>
             </transition>
@@ -317,7 +318,7 @@
 
 <script>
     import {mapState, mapMutations} from 'vuex'
-    import {msiteAddress, shopDetails, foodMenu, getRatingList, ratingScores, ratingTags} from 'src/service/getData'
+    import {msiteAddress, shopDetails, getShopMenuFoods, getRatingList, ratingScores, ratingTags} from 'src/service/getData'
     import loading from 'src/components/common/loading'
     import buyCart from 'src/components/common/buyCart'
     import ratingStar from 'src/components/common/ratingStar'
@@ -366,8 +367,24 @@
             }
         },
         created(){
-            this.geohash = this.$route.query.geohash;
-            this.shopId = this.$route.query.id;
+            console.log('shop.vue.create()')
+            console.log(this.shopDetail)
+            console.log(this.$route.query.geohash)
+            console.log(this.$route.query.shopId)
+            if (this.$route.query.geohash) {
+                this.geohash = this.$route.query.geohash;
+            }
+            if (this.$route.query.shopId) {
+                console.log('this.$route.query.shopId true')
+                this.shopId = this.$route.query.shopId;
+                // this.shopDetailData = this.$route.query.shopDetail;
+            } else {
+                console.log('this.$route.query.shopId false')
+                this.shopId = this.shopDetail.id;
+                this.shopDetailData = this.shopDetail;
+            }
+            console.log(this.shopId)
+            console.log(this.shopDetailData)
             this.INIT_BUYCART();
         },
         mounted(){
@@ -385,7 +402,7 @@
         },
         computed: {
             ...mapState([
-                'latitude','longitude','cartList'
+                'latitude','longitude','cartList','shopDetail'
             ]),
             promotionInfo: function (){
                 return this.shopDetailData.promotion_info || '欢迎光临，用餐高峰期请提前下单，谢谢。'
@@ -425,22 +442,33 @@
             ]),
             //初始化时获取基本数据
             async initData(){
+                console.log('shop.vue.initData()')
                 if (!this.latitude) {
                     //获取位置信息
                     let res = await msiteAddress(this.geohash);
                     // 记录当前经度纬度进入vuex
                     this.RECORD_ADDRESS(res);
                 }
+                // 2018-10-30, shopDetail will get from selectedItem from shoplist.vue
                 //获取商铺信息
-                this.shopDetailData = await shopDetails(this.shopId, this.latitude, this.longitude);
+                // this.shopDetailData = await shopDetails(this.shopId, this.latitude, this.longitude);
                 //获取商铺食品列表
-                this.menuList = await foodMenu(this.shopId);
-                //评论列表
-                this.ratingList = await getRatingList(this.shopId, this.ratingOffset);
-                //商铺评论详情
-                this.ratingScoresData = await ratingScores(this.shopId);
-                //评论Tag列表
-                this.ratingTagsList = await ratingTags(this.shopId);
+                console.log('shop.vue  this.shopId')
+                console.log(this.shopId)
+                let shopMenuFoodRes = await getShopMenuFoods(this.shopId);
+                console.log('shop.vue.shopMenuFoodRes')
+                console.log(shopMenuFoodRes)
+                this.menuList = shopMenuFoodRes.data.foodMenuList;
+                this.shopDetailData = shopMenuFoodRes.data.shopInfo;
+                console.log('shop.vue.menuList')
+                console.log(this.menuList)
+                // TODO: enable rating
+                // //评论列表
+                // this.ratingList = await getRatingList(this.shopId, this.ratingOffset);
+                // //商铺评论详情
+                // this.ratingScoresData = await ratingScores(this.shopId);
+                // //评论Tag列表
+                // this.ratingTagsList = await ratingTags(this.shopId);
                 this.RECORD_SHOPDETAIL(this.shopDetailData)
                 //隐藏加载动画
                 this.hideLoading();
@@ -505,33 +533,37 @@
                 }
             },
             //加入购物车，所需7个参数，商铺id，食品分类id，食品id，食品规格id，食品名字，食品价格，食品规格
-            addToCart(category_id, item_id, food_id, name, price, specs){
-                this.ADD_CART({shopid: this.shopId, category_id, item_id, food_id, name, price, specs});
+            addToCart(food_category_id, item_id, food_id, name, price, specs){
+                this.ADD_CART({shopid: this.shopId, food_category_id, item_id, food_id, name, price, specs});
             },
             //移出购物车，所需7个参数，商铺id，食品分类id，食品id，食品规格id，食品名字，食品价格，食品规格
-            removeOutCart(category_id, item_id, food_id, name, price, specs){
-                this.REDUCE_CART({shopid: this.shopId, category_id, item_id, food_id, name, price, specs});
+            removeOutCart(food_category_id, item_id, food_id, name, price, specs){
+                this.REDUCE_CART({shopid: this.shopId, food_category_id, item_id, food_id, name, price, specs});
             },
             /**
              * 初始化和shopCart变化时，重新获取购物车改变过的数据，赋值 categoryNum，totalPrice，cartFoodList，整个数据流是自上而下的形式，所有的购物车数据都交给vuex统一管理，包括购物车组件中自身的商品数量，使整个数据流更加清晰
              */
             initCategoryNum(){
+                console.log('shop.vue.initCategoryNum()')
+                console.log(this.shopCart)
                 let newArr = [];
                 let cartFoodNum = 0;
                 this.totalPrice = 0;
                 this.cartFoodList = [];
                 this.menuList.forEach((item, index) => {
-                    if (this.shopCart&&this.shopCart[item.foods[0].category_id]) {
+                    console.log(item)
+                    if (this.shopCart&&this.shopCart[item.foods[0].food_category_id]) {
                         let num = 0;
-                        Object.keys(this.shopCart[item.foods[0].category_id]).forEach(itemid => {
-                            Object.keys(this.shopCart[item.foods[0].category_id][itemid]).forEach(foodid => {
-                                let foodItem = this.shopCart[item.foods[0].category_id][itemid][foodid];
+                        Object.keys(this.shopCart[item.foods[0].food_category_id]).forEach(itemid => {
+                            Object.keys(this.shopCart[item.foods[0].food_category_id][itemid]).forEach(foodid => {
+                                let foodItem = this.shopCart[item.foods[0].food_category_id][itemid][foodid];
+                                console.log(foodItem)
                                 num += foodItem.num;
                                 if (item.type == 1) {
                                     this.totalPrice += foodItem.num*foodItem.price;
                                     if (foodItem.num > 0) {
                                         this.cartFoodList[cartFoodNum] = {};
-                                        this.cartFoodList[cartFoodNum].category_id = item.foods[0].category_id;
+                                        this.cartFoodList[cartFoodNum].food_category_id = item.foods[0].food_category_id;
                                         this.cartFoodList[cartFoodNum].item_id = itemid;
                                         this.cartFoodList[cartFoodNum].food_id = foodid;
                                         this.cartFoodList[cartFoodNum].num = foodItem.num;
@@ -548,6 +580,9 @@
                         newArr[index] = 0;
                     }
                 })
+                console.log(newArr)
+                console.log(this.totalPrice)
+                console.log(this.cartFoodList)
                 this.totalPrice = this.totalPrice.toFixed(2);
                 this.categoryNum = [...newArr];
             },
@@ -615,8 +650,8 @@
                 this.specsIndex = index;
             },
             //多规格商品加入购物车
-            addSpecs(category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock){
-                this.ADD_CART({shopid: this.shopId, category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock});
+            addSpecs(food_category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock){
+                this.ADD_CART({shopid: this.shopId, food_category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock});
                 this.showChooseList();
             },
             //显示提示，无法减去商品

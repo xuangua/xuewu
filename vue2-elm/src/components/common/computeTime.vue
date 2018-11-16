@@ -9,6 +9,7 @@
 
 <script>
     import alertTip from 'src/components/common/alertTip'
+    import {mapState, mapMutations} from 'vuex'
 
     export default {
     	data(){
@@ -19,14 +20,27 @@
             }
         },
         mounted(){
+            // console.log("orderData")
+            // console.log(this.orderData)
+            // console.log('time')
+            // console.log(this.time)
             this.countNum -= this.numTime;
             this.remainingTime();
         },
-        props: ['time'],
+        props: {
+            //从父组件传来的time标题
+            time: '',
+            //从父组件传来的条件数组
+            orderData: {}
+        },
+        // props: ['time'],
         components: {
             alertTip,
         },
         methods: {
+             ...mapMutations([
+               'SAVE_ORDER'
+            ]),
             closeTip(){
                 this.$emit('closeTip')
             },
@@ -43,8 +57,13 @@
                 }, 1000);
             },
             gotoPay(){
-                this.showAlert = true;
-                this.alertText = '暂不开放支付接口';
+                console.log("orderData")
+                console.log(this.orderData)
+                this.SAVE_ORDER(this.orderData);
+                // this.$router.push('/order/orderPay');
+                window.location.href="/orderPay?orderid="+this.orderData.id;
+                // this.showAlert = true;
+                // this.alertText = '暂不开放支付接口';
             }
         },
         computed: {

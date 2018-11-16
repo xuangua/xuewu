@@ -85,7 +85,7 @@
         props:[],
         computed: {
             ...mapState([
-                'userInfo', 'addressIndex', 'newAddress'
+                'userInfo', 'addressIndex', 'newAddress','shopDetail'
             ]),
             //选择地址
             defaultIndex: function (){
@@ -107,10 +107,12 @@
                 this.deliverdisable = [];
 
                 if (this.userInfo && this.userInfo.user_id) {
-                    this.addressList = await getAddressList(this.userInfo.user_id);
+                    let userShipAddrListRes = await getAddressList(this.userInfo.user_id, this.shopDetail.school_name, this.shopDetail.school_campus_name);
+                    this.addressList = userShipAddrListRes.data.userShipAddrArray
+                    console.log(this.addressList)
                     //将当前所有地址访问有效无效两种
                     this.addressList.forEach(item => {
-                        if (item.is_deliverable) {
+                        if ((item.school_name === this.shopDetail.school_name) && (item.school_campus_name === this.shopDetail.school_campus_name)) {
                             this.deliverable.push(item);
                         }else{
                             this.deliverdisable.push(item);

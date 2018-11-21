@@ -59,8 +59,8 @@
 			async submitForm(formName) {
 				this.$refs[formName].validate(async (valid) => {
 					if (valid) {
-						const res = await register({user_name: this.registerForm.username, password: this.registerForm.password})
-						if (res.status == 1) {
+						const res = await register({name: this.registerForm.username, email: "111@111.com", password: this.registerForm.password})
+						if (res.errNo == 0) {
 							this.$message({
 		                        type: 'success',
 		                        message: '注册成功'

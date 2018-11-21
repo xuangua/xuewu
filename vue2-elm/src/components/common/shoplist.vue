@@ -1,6 +1,13 @@
 <template>
     <div class="shoplist_container">
-        <ul v-load-more="loaderMore" v-if="shopListArr.length" type="1">
+        <ul v-if="noSchoolAddr" class="noshop-title">
+            <div slot="content" class="noshop_data">
+                您附近没有店铺，去其他校园转转吧~~
+            </div>
+            <!-- <div class="change_addr_button">切换地址</div> -->
+            <mt-button type="primary" @click.prevent="goAddressSelect()">切换地址</mt-button>
+        </ul>
+        <ul v-load-more="loaderMore" v-else-if="shopListArr.length" type="1">
             <router-link :to="{path: 'shop', query:{geohash, shopId: item.id}}" v-for="item in shopListArr" tag='li' :key="item.id" class="shop_li">
                 <section>
                     <img :src="imgBaseUrl + item.image_path" class="shop_img">
@@ -45,10 +52,14 @@
                 </hgroup>
             </router-link>
         </ul>
-        <ul v-else class="animation_opactiy">
-            <li class="list_back_li" v-for="item in 10" :key="item">
+        <ul v-else class="empty_data">
+<!--             <li class="list_back_li" v-for="item in 10" :key="item">
                 <img src="../../images/shopback.svg" class="list_back_svg">
-            </li>
+            </li> -->
+            <!-- <div class="noshop-img" style=""></div> -->
+            <div slot="content" class="noshop-title">
+                We're sorry! 您选择的校区没有店铺，赶快去开第一家店铺吧~~
+            </div>
         </ul>
         <p v-if="touchend" class="empty_data">没有更多了</p>
         <aside class="return_top" @click="backTop" v-if="showBackStatus">
@@ -64,7 +75,7 @@
 </template>
 
 <script>
-
+import {Button} from 'mint-ui'
 import {mapState} from 'vuex'
 import {shopList} from 'src/service/getData'
 import {imgBaseUrl} from 'src/config/env'
@@ -82,6 +93,7 @@ export default {
             showBackStatus: false, //显示返回顶部按钮
             showLoading: true, //显示加载动画
             touchend: false, //没有更多数据
+            noSchoolAddr: false, //根据GEO，没有获取到附件学校信息
             imgBaseUrl,
         }
     },
@@ -91,12 +103,13 @@ export default {
     components: {
         loading,
         ratingStar,
+        Button,
     },
     props: ['restaurantCategoryId', 'restaurantCategoryIds', 'sortByType', 'deliveryMode', 'supportIds', 'confirmSelect', 'geohash'],
     mixins: [loadMore, getImgPath],
     computed: {
         ...mapState([
-            'latitude','longitude','decidedSchoolData'
+            'latitude','longitude','decidedSchoolData','realAddrName','shopAddrName'
         ]),
     },
     updated(){
@@ -105,18 +118,30 @@ export default {
     methods: {
         async initData(){
             console.log('shopList.initData')
+            console.log(this.realAddrName)
+            console.log(this.shopAddrName)
             console.log(this.decidedSchoolData)
-            //获取数据
-            let res = await shopList(this.latitude, this.longitude, this.decidedSchoolData.school_name, this.decidedSchoolData.school_campus_name, this.offset, this.restaurantCategoryId);
-            this.shopListArr = [...res.data.shopList];
-            if (res.length < 20) {
-                this.touchend = true;
+
+            if (this.shopAddrName === ''){
+                this.noSchoolAddr = true;
+                //提示用户该区域没有店铺，请重新选择地址
+                this.hideLoading();
+            } else {
+                //获取数据
+                let res = await shopList(this.latitude, this.longitude, this.decidedSchoolData.school_name, this.decidedSchoolData.school_campus_name, this.offset, this.restaurantCategoryId);
+                if (res.data.shopList != null) {
+                    this.shopListArr = [...res.data.shopList];
+                }
+                if (this.shopListArr!=null && this.shopListArr.length && this.shopListArr.length < 20) {
+                    this.touchend = true;
+                }
+                this.hideLoading();
+                //开始监听scrollTop的值，达到一定程度后显示返回顶部按钮
+                showBack(status => {
+                    this.showBackStatus = status;
+                });                
             }
-            this.hideLoading();
-            //开始监听scrollTop的值，达到一定程度后显示返回顶部按钮
-            showBack(status => {
-                this.showBackStatus = status;
-            });
+
         },
         //到达底部加载更多数据
         async loaderMore(){
@@ -171,6 +196,10 @@ export default {
                 zhunStatus = false;
             }
             return zhunStatus
+        },
+        //搜索
+        async goAddressSelect(){
+            this.$router.push({path:'/home'})
         },
     },
     watch: {
@@ -337,5 +366,35 @@ export default {
     }
     .loading-enter, .loading-leave-active {
         opacity: 0
+    }
+
+    .noshop-title {
+        color: #ff0000;
+        text-align: center;
+        font-weight: 500;
+        font-size: 16px;
+        position: absolute;
+        left: 0;
+        right: 0;
+        width: 100%;
+        text-align: center;
+        top: 40%;
+    }
+    .noshop_data{
+        @include sc(0.5rem, #ff6600);
+        font-weight: 500;
+        font-size: 16px;
+        text-align: center;
+        line-height: 2rem;
+    }
+    .change_addr_button{
+        @include wh(30%, 2rem);
+        @include sc(.8rem, #fff);
+        border-radius: 0.15rem;
+        left: 50%;
+        line-height: 2rem;
+        margin-top: 1rem;
+        text-align: center;
+        background-color: #ccc;
     }
 </style>

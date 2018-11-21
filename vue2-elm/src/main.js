@@ -1,4 +1,6 @@
 import Vue from 'vue'
+import MintUI from 'mint-ui'
+import 'mint-ui/lib/style.css'
 import VueRouter from 'vue-router'
 import routes from './router/router'
 import store from './store/'
@@ -12,6 +14,7 @@ if ('addEventListener' in document) {
     }, false);
 }
 
+Vue.use(MintUI)
 Vue.use(VueRouter)
 const router = new VueRouter({
 	routes,

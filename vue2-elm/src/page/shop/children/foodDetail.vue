@@ -9,20 +9,20 @@
         <section class="detail_container">
             <section class="detail_left">
                 <p>{{name}}</p>
-                <div class="rating_sale">
+<!--                 <div class="rating_sale">
                     <span>评分</span>
                     <rating-star :rating='rating'></rating-star>
                     <span>{{rating.toFixed(1)}}</span>
-                </div>
+                </div> -->
                 <p>
                     <span>月售 {{month_sales}}单</span>
                     <span>售价 ¥{{foods.specfoods[0].price}}</span>
                     <span v-if="foods.specfoods.length">起</span>
                 </p>
-                <p>
+<!--                 <p>
                     <span>评论数 {{rating_count}}</span>
                     <span>好评率 {{satisfy_rate}}%</span>
-                </p>    
+                </p>    --> 
             </section>
             <!-- <buy-cart :shopId='shopId'  :foods='foods' @moveInCart="$emit('moveInCart')"></buy-cart> -->
         </section>

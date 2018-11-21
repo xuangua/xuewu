@@ -1,12 +1,12 @@
 <template>
     <div>
         <head-top signin-up='msite'>
-            <router-link :to="'/search/geohash'" class="link_search" slot="search">
+<!--             <router-link :to="'/search/geohash'" class="link_search" slot="search">
                 <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" version="1.1">
                     <circle cx="8" cy="8" r="7" stroke="rgb(255,255,255)" stroke-width="1" fill="none"/>
                     <line x1="14" y1="14" x2="20" y2="20" style="stroke:rgb(255,255,255);stroke-width:2"/>
                 </svg>
-            </router-link>
+            </router-link> -->
             <router-link to="/home" slot="msite-title" class="msite_title">
                 <span class="title_text ellipsis">{{msiteTitle}}</span>
             </router-link>
@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import {mapMutations} from 'vuex'
+import {mapState, mapMutations} from 'vuex'
 // import {imgBaseUrl} from 'src/config/env'
 import headTop from 'src/components/header/head'
 import footGuide from 'src/components/footer/footGuide'
@@ -64,29 +64,42 @@ export default {
         }
     },
     async beforeMount(){
-        console.log('msite.beforeMount')
-        if (!this.$route.query.geohash) {
-            // const address = await cityGuess();
-            // this.geohash = address.latitude + ',' + address.longitude;
-            this.geohash = '30.441963,114.268434'
-        }else{
-            // this.geohash = this.$route.query.geohash
-            this.geohash = '30.441963,114.268434'
-        }
-        this.geohash = '30.441963,114.268434'
-        //保存geohash 到vuex
-        this.SAVE_GEOHASH(this.geohash);
-        //获取位置信息
-        let res = await msiteAddress(this.geohash);
-        this.msiteTitle = res.pios.name;
-        // 记录当前经度纬度
-        // this.RECORD_ADDRESS(res.pios);
+        if (this.$route.query.chooseSchoolId){
+            console.log("this.chosenSchoolCampusData")
+            console.log(this.chosenSchoolCampusData)
 
-        // 记录user detail address ifno
-        this.realAddrName = res.realAddrName;
-        this.shopAddrName = res.shopAddrName;
-        this.decidedSchoolData = res.decidedSchoolData;
-        this.SAVE_USER_DETAIL_ADDRESS(res);
+            this.msiteTitle = this.chosenSchoolCampusData.schoolName + '(' + this.chosenSchoolCampusData.schoolCampusName + ')';
+            this.shopAddrName = this.msiteTitle;
+        } else {
+            console.log('this.$route.query.geohash')
+            console.log(this.$route.query.geohash)
+            if (!this.$route.query.geohash) {
+                // const address = await cityGuess();
+                // this.geohash = address.latitude + ',' + address.longitude;
+                this.geohash = '30.441963,114.268434'
+            }else{
+                this.geohash = this.$route.query.geohash
+                // this.geohash = '30.441963,114.268434'
+            }
+            // this.geohash = '30.441963,114.268434'
+            //保存geohash 到vuex
+            this.SAVE_GEOHASH(this.geohash);
+            //获取位置信息
+            let res = await msiteAddress(this.geohash);
+            if (this.shopAddrName === ''){
+                this.msiteTitle = res.realAddrName;
+            } else {
+                this.msiteTitle = res.shopAddrName;
+            }
+            // 记录当前经度纬度
+            // this.RECORD_ADDRESS(res.pios);
+
+            // 记录user detail address ifno
+            this.realAddrName = res.realAddrName;
+            this.shopAddrName = res.shopAddrName;
+            this.decidedSchoolData = res.decidedSchoolData;
+            this.SAVE_USER_DETAIL_ADDRESS(res);
+        }
 
         this.hasGetData = true;
     },
@@ -114,7 +127,9 @@ export default {
         footGuide,
     },
     computed: {
-
+        ...mapState([
+            'chosenSchoolCampusData'
+        ]),
     },
     methods: {
         ...mapMutations([

@@ -47,11 +47,23 @@ export const searchplace = (cityid, value) => fetch('/v1/pois', {
 
 
 /**
- * 获取msite页面地址信息
+ * 根据用户选择的 GEO 获取msite页面地址信息
  */
-
 export const msiteAddress = geohash => fetch('/customer/get_pois/' + geohash);
 
+/**
+ * 根据用户选择的 学校/校区/地址 获取msite页面地址信息
+ */
+export const msiteAddressWithChosenSchool = (province, city, district, schoolCampusName, schoolCampusId) => fetch('/customer/get_pois/' + geohash);
+
+/**
+ * 获取 以支持学校列表
+ */
+export const getSupportedSchoolList = (province, city, district) => fetch('/customer/getSupportedSchoolList', {
+    province: province,
+    city: city,
+    district: district
+});
 
 /**
  * 获取msite页面食品分类列表

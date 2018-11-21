@@ -44,14 +44,17 @@ export default {
     },
 
     mounted(){
+        // this.getQQH5Addr();
+        console.log('this.isWechat()')
+        console.log(this.isWechat())
         if(this.isWechat()){
             if (!(this.userInfo && this.userInfo.user_id)) {
                 this.$router.push({path:'/wxlogin'})
             } else if (!this.geohash) {
                 this.getWxConfig();
             } else {
-                let geo = this.geohash
-                this.$router.push({path:'/msite', query:{geo}})
+                let geohash = this.geohash
+                this.$router.push({path:'/msite', query:{geohash}})
             }
         }else{
             this.$router.push({path:'/msite'})
@@ -78,21 +81,50 @@ export default {
             let ua = window.navigator.userAgent.toLowerCase();
             return ua.match(/MicroMessenger/i) == 'micromessenger';
         },
+
+        // getQQH5Addr() {
+        //     var geolocation = new qq.maps.Geolocation("SVZBZ-AL7WV-IMZPP-UBSMC-VHYT7-7NF3J", "xuewu");
+        //     var options = {timeout: 8000};
+        //     function showPosition(position) {
+        //         console.log('position');
+        //         console.log(position);
+        //     };
+     
+        //     function showErr() {
+        //         console.log('定位失败');
+        //     };
+
+        //     geolocation.getLocation(
+        //         function (position) {
+        //             console.log('position');
+        //             console.log(position);
+        //         }, 
+        //         function (position) {
+        //             console.log('定位失败');
+        //             console.log(position);
+        //         },
+        //         options)
+        // },
+
         //获取微信配置 
         getWxConfig(){
             let that = this;
-            let geo = ''
-            // let lat = ''
-            // let long = ''
+            let geohash = ''
+            let lat = ''
+            let long = ''
             // let params = {
             //     url: 'http://www.123.com/shop/index1.html'
             // }
+            console.log('this.$route.fullPath')
             console.log(this.$route.fullPath)
+            console.log('window.location')
             console.log(window.location)
 
             let accessurl = window.location.origin + window.location.pathname;
+            console.log('accessurl')
             console.log(accessurl)
             getWxConfigNeededData(accessurl).then(res => {
+                console.log('getWxConfigNeededData res:')
                 console.log(res)
                 wx.config({
                     debug: false,
@@ -119,7 +151,9 @@ export default {
                     //     //alert(res.err_msg + "唯一");
                     // });
                     wx.getLocation({
+                        type: 'gcj02',
                         success: function (res) {
+                            console.log('wx.getLocation res:')
                             console.log(res)
                             // that.pointY = res.latitude; // 纬度，浮点数，范围为90 ~ -90
                             // that.pointX = res.longitude; // 经度，浮点数，范围为180 ~ -180。
@@ -128,15 +162,13 @@ export default {
                             // that.marker = new BMap.Marker(that.point); // 创建点
 
                             // that.getShopFjStudio()
-                            geo = res.latitude + ',' + res.longitude;
+                            geohash = res.latitude + ',' + res.longitude;
                             // 记录当前经度纬度
-                            // lat = res.latitude;
-                            // long = res.longitude;
-                            // this.RECORD_ADDRESS({lat, long});
-                            // this.SAVE_GEOHASH(geo);
-                            console.log(geo)
+                            lat = res.latitude;
+                            long = res.longitude;
+                            console.log(geohash)
                             // that.$router.push({path:'/wxlogin'})
-                            that.$router.push({path:'/msite', query:{geo}})
+                            that.$router.push({path:'/msite', query:{geohash}})
                             // return geo
                         },
                         cancel: function (res) {

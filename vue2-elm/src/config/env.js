@@ -14,7 +14,7 @@ let imgBaseUrl = '';
 
 if (process.env.NODE_ENV == 'development') {
     //baseUrl = '//dev.xuangua.xyz';
-    baseUrl = 'https://wemall.wxapp.xuangua.xyz/api/xuewu';
+    baseUrl = '//wemall.wxapp.xuangua.xyz/api/xuewu';
     // baseUrl = '//dev.xuangua.com/api/xuewu';
     imgBaseUrl = '/img/';
 

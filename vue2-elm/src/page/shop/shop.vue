@@ -65,9 +65,9 @@
                 <div>
                     <span :class='{activity_show: changeShowType =="food"}' @click="changeShowType='food'">商品</span>
                 </div>
-                <div>
+<!--                 <div>
                     <span :class='{activity_show: changeShowType =="rating"}' @click="changeShowType='rating'">评价</span>
-                </div>
+                </div> -->
             </section>
             <transition name="fade-choose">
                 <section v-show="changeShowType =='food'" class="food_container">

@@ -16,7 +16,7 @@
                 </li>
             </ul>
         </section>
-        <section class="shop_status_container">
+<!--         <section class="shop_status_container">
             <router-link to="/shop/shopDetail/shopSafe" class="shop_status_header">
                 <span class="shop_detail_title">食品监督安全公示</span>
                 <div>
@@ -47,13 +47,13 @@
                     </p>
                 </div>
             </section>
-        </section>
+        </section> -->
         <section class="shop_status_info">
             <header>商家信息</header>
             <p>{{shopDetail.name}}</p>
             <p>地址：{{shopDetail.address}}</p>
             <p>营业时间：[{{shopDetail.opening_hours[0]}}]</p>
-            <p @click="showLicenseImg(shopDetail.license.business_license_image)">
+<!--             <p @click="showLicenseImg(shopDetail.license.business_license_image)">
                 <span>营业执照</span>
                 <svg width="14" height="14" xmlns="http://www.w3.org/2000/svg" version="1.1" class="description_arrow" >
                     <path d="M0 0 L8 7 L0 14"  stroke="#bbb" stroke-width="1.5" fill="none"/>
@@ -63,7 +63,7 @@
                 <svg width="14" height="14" xmlns="http://www.w3.org/2000/svg" version="1.1" class="description_arrow" >
                     <path d="M0 0 L8 7 L0 14"  stroke="#bbb" stroke-width="1.5" fill="none"/>
                 </svg>
-            </p>
+            </p> -->
         </section>
         <transition name="fade">
             <section class="license_container" v-if="showlicenseImg" @click="showlicenseImg = false">

@@ -2,6 +2,8 @@ import {
     RECORD_ADDRESS,
     SAVE_USER_REAL_ADDRESS,
     SAVE_USER_DETAIL_ADDRESS,
+    UPDATE_USER_DETAIL_ADDRESS,
+    SAVE_USER_CHOSEN_SCHOOL_ADDRESS,
     ADD_CART,
     REDUCE_CART,
     INIT_BUYCART,
@@ -59,7 +61,8 @@ export default {
     [SAVE_USER_DETAIL_ADDRESS](state, {
         realAddrName,
         shopAddrName,
-        decidedSchoolData       
+        decidedSchoolData,
+        realaddressDetail
     }) {
         // console.log('SAVE_USER_DETAIL_ADDRESS.realAddrName')
         // console.log(realAddrName)
@@ -70,8 +73,45 @@ export default {
         state.realAddrName = realAddrName;
         state.shopAddrName = shopAddrName;
         state.decidedSchoolData = decidedSchoolData;
+        state.realaddressDetail = realaddressDetail;
         state.latitude = decidedSchoolData.location.lat;
         state.longitude = decidedSchoolData.location.lng;
+    },
+
+    [UPDATE_USER_DETAIL_ADDRESS](state, {
+        shopAddrName,
+        decidedSchoolData
+    }) {
+        console.log('UPDATE_USER_DETAIL_ADDRESS.shopAddrName')
+        console.log(shopAddrName)
+        console.log('UPDATE_USER_DETAIL_ADDRESS.decidedSchoolData')
+        console.log(decidedSchoolData)
+
+        state.shopAddrName = shopAddrName;
+        state.decidedSchoolData = decidedSchoolData;
+        state.latitude = decidedSchoolData.location.lat;
+        state.longitude = decidedSchoolData.location.lng;
+    },
+
+    [SAVE_USER_CHOSEN_SCHOOL_ADDRESS](state, {
+        province,
+        city,
+        district,
+        schoolName,
+        schoolCampusName,
+        schoolCampusId
+    }) {
+        let chosenSchoolData = {
+            province: province,
+            city: city,
+            district: district,
+            schoolName: schoolName,
+            schoolCampusName: schoolCampusName,
+            schoolCampusId: schoolCampusId,
+        }
+        state.chosenSchoolCampusData = chosenSchoolData;
+        console.log('SAVE_USER_CHOSEN_SCHOOL_ADDRESS.chosenSchoolCampusData')
+        console.log(state.chosenSchoolCampusData)
     },
 
     [RECORD_SHOPDETAIL](state, detail) {

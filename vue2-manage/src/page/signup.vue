@@ -4,60 +4,36 @@
             <div class="signup-head-content">
                 <a href="/">
                     <!-- <img src="~assets/images/logo.png" alt=""> -->
-                    <span>xuangua</span>
+                    <span>学屋商城后台管你系统</span>
                 </a>
             </div>
         </div>
         <div class="signup-box">
             <div class="signup-nav">
                 <span class="title">{{!success ? '账号注册' : '邮箱验证' }}</span>
-                <span class="desc">{{!success ? '如果您有xuangua账号' : '如果您已经完成验证'}}，那么可以<a href="/signin">登录</a></span>
+                <span class="desc">{{!success ? '如果您有 学屋商城 账号' : '如果您已经完成验证'}}，那么可以<a href="/signin">登录</a></span>
             </div>
-            <Form v-show="isMounted" ref="formCustom" :model="formCustom" :rules="ruleCustom" :label-width="80" class="signup-form" v-if="!success" style="height: 500px">
-                <el-form-item label="用户名" prop="username">
-                    <el-input v-model="formCustom.username" maxLength="11"></el-input>
+
+            <div style="margin: 20px;"></div>
+            <el-form :model="formCustom" :label-position="labelPosition" ref="formCustom" label-width="80px" style="height: 500px">
+                <el-form-item label="用户名" prop="username" class="signup-label">
+                    <el-input size="large" v-model="formCustom.username" placeholder="用户名" class="signup-input" maxLength="20">4-20位可由中文、数字、字母组成</el-input>
+                    <!-- <span class="signup-label"></span> -->
                     <span class="signup-label">4-20位可由中文、数字、字母组成</span>
                 </el-form-item>
-<!--                 <Form-item label="用户名" prop="username">
-                    <i-input
-                        size="large"
-                        type="text"
-                        v-model="formCustom.username"
-                        @on-blur="blur('formCustom.username')"
-                        class="signup-input"></i-input>
-                    <span class="signup-label">4-20位可由中文、数字、字母组成</span>
-                </Form-item> -->
-                <Form-item label="密码" prop="passwd">
-                    <i-input size="large" type="password" v-model="formCustom.passwd" class="signup-input"></i-input>
-                    <span class="signup-label">密码由6-20个字符组成，区分大小写</span>
-                </Form-item>
-                <Form-item label="确认密码" prop="passwdCheck">
-                    <i-input size="large" type="password" v-model="formCustom.passwdCheck" class="signup-input"></i-input>
+                <el-form-item label="密码" prop="password" class="signup-label">
+                    <el-input size="large" type="password" placeholder="密码" class="signup-input"  v-model="formCustom.passwd"></el-input>
+                    <span class="signup-label">6-20位可由中文、数字、字母组成</span>
+                </el-form-item>
+                <el-form-item label="确认密码" prop="passwdCheck" class="signup-label">
+                    <el-input size="large" type="password" placeholder="再次输入密码" class="signup-input"  v-model="formCustom.passwdCheck"></el-input>
                     <span class="signup-label">请在此确认您的密码</span>
-                </Form-item>
-                <Form-item label="邮箱" prop="email">
-                    <i-input
-                        size="large"
-                        @on-blur="blur('formCustom.email')"
-                        v-model="formCustom.email"
-                        class="signup-input"></i-input>
-                    <span class="signup-label">请输入有效的电子邮箱</span>
-                </Form-item>
-                <i-button type="primary" size="large" class="signup-button" @click="handleSubmit('formCustom')">立即注册</i-button>
-            </Form>
-            <div v-if="success" class="signup-message-box" style="height: 500px">
-                <div>
-                    <!-- <div class="message-mail-icon"><img src="~assets/images/mail.png" alt=""></div> -->
-                    <div class="message-mail-right">
-                        <p class="signup-reminder-text">我们发送了一封验证邮件到<span class="signup-resend">{{formCustom.email}}</span></p>
-                        <p class="signup-reminder-text">请到您的邮箱收信，并点击其中的链接验证您的邮箱</p>
-                        <a :href="`http://mail.${formCustom.email.split('@')[formCustom.email.split('@').length - 1]}`" target="_blank"><i-button type="primary">去邮箱验证</i-button></a>
-                        <p class="signup-reminder-text signup-text-bottom">收不到邮件？</p>
-                        <p class="signup-reminder-small">请查看您的垃圾邮件和广告邮件，邮件有可能会被误认为是垃圾邮件或广告邮件</p>
-                        <p class="signup-reminder-small signup-resend click-mouse">重新发送</p>
-                    </div>
-                </div>
-            </div>
+                </el-form-item>
+
+                <el-form-item>
+                    <el-button type="primary" @click="submitForm('formCustom')" class="signup-button">注册</el-button>
+                </el-form-item>
+            </el-form>
         </div>
     </div>
 </template>
@@ -66,7 +42,8 @@
     // import ErrorCode from '~/constant/ErrorCode'
     // import config from '~/config'
     // import request from '~/net/request'
-    // import {trim, trimBlur} from '~/utils/tool'
+    import {trim, trimBlur} from '@/utils/tool'
+    import {register, getAdminInfo} from '@/api/getData'
 
     export default {
         data () {
@@ -103,6 +80,7 @@
             return {
                 isMounted: false,
                 loading: false,
+                labelPosition: 'left',
                 formCustom: {
                     passwd: '',
                     passwdCheck: '',
@@ -179,7 +157,33 @@
             },
             blur (name) {
                 trimBlur(name, this)
-            }
+            },
+            async submitForm(formName) {
+                this.$refs[formName].validate(async (valid) => {
+                    if (valid) {
+                        const res = await register({name: trim(this.formCustom.username), email: "111@111.com", password: trim(this.formCustom.passwd)})
+                        if (res.errNo == 0) {
+                            this.$message({
+                                type: 'success',
+                                message: '注册成功, 现在就去登录吧~~'
+                            });
+                            this.$router.push('manage')
+                        }else{
+                            this.$message({
+                                type: 'error',
+                                message: res.message
+                            });
+                        }
+                    } else {
+                        this.$notify.error({
+                            title: '错误',
+                            message: '请输入用户名或密码',
+                            offset: 100
+                        });
+                        return false;
+                    }
+                });
+            },
         },
         mounted () {
             this.isMounted = true
